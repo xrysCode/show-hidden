@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * @author xry
  * @since 2021-10-05
  */
-@Service
+//@Service
 public class WebComponentTreeServiceImpl extends ServiceImpl<WebComponentTree, WebComponentTreeEntity> implements IWebComponentTreeService {
 
     @Override

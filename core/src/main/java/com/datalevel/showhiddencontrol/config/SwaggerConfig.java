@@ -36,8 +36,16 @@ public class SwaggerConfig {
      * Every Docket bean is picked up by the swagger-mvc framework - allowing for multiple
      * swagger groups i.e. same code base multiple swagger resource listings.
      */
-    @Bean(name = "appApi")
-    public Docket createRestApi(){
+    @Bean(name = "base")
+    public Docket createRestApiBase(){
+        return createRestApi("基础元数据","com.datalevel.showhiddencontrol.base.controller");
+    }
+
+    @Bean(name = "base")
+    public Docket createRestApiAuth(){
+        return createRestApi("权限基础","com.datalevel.showhiddencontrol.auth.controller");
+    }
+    private Docket createRestApi(String groupName ,String basePackage){
         ParameterBuilder ticketPar = new ParameterBuilder();
         List<Parameter> pars = new ArrayList<>();
         Parameter build = ticketPar.name("Token")
@@ -50,11 +58,11 @@ public class SwaggerConfig {
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .select()
 //                .apis(RequestHandlerSelectors.any())
-                .apis(RequestHandlerSelectors.basePackage("com.datalevel.showhiddencontrol.core.controller"))
+                .apis(RequestHandlerSelectors.basePackage(basePackage))
                 .paths(PathSelectors.any())
                 .build()
                 .globalOperationParameters(pars)//..globalResponseMessage()
-                .apiInfo(apiInfo()).groupName("组名");
+                .apiInfo(apiInfo()).groupName(groupName);
         if("prod".equals(environment.getProperty("spring.profiles.active"))){
             docket.enable(false);
         }
@@ -88,6 +96,7 @@ public class SwaggerConfig {
         docket.useDefaultResponseMessages(false);
         return docket;
     }
+
 
 //    @Bean(name = "admin")
     public Docket createRestApi2(){

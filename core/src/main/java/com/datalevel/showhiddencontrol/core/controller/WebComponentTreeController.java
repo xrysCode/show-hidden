@@ -19,7 +19,7 @@ import java.util.List;
  * @author xry
  * @since 2021-10-05
  */
-@RestController
+//@RestController
 @RequestMapping("/web/component-tree")
 //@ApiOperation("web组件树")
 @Api(tags = "组件树")
