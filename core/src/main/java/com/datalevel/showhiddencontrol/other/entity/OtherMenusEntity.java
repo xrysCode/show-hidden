@@ -1,8 +1,10 @@
 package com.datalevel.showhiddencontrol.other.entity;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,6 +16,8 @@ import org.apache.ibatis.annotations.Update;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -51,10 +55,11 @@ public class OtherMenusEntity implements Serializable {
     private String routerPath;
 
     @ApiModelProperty(value = "组件props 属性json")
-    private String props;
+    @JsonIgnore
+    private String comProps;
 
     @ApiModelProperty(value = "组件位置")
-    private String componentPosition;
+    private String comImport;
 
     @ApiModelProperty(value = "菜单排序")
     @NotNull(groups = {Insert.class})
@@ -67,5 +72,15 @@ public class OtherMenusEntity implements Serializable {
 
     private String createUser;
 
+
+    @ApiModelProperty(value = "组件props 属性json")
+    public Map<String,Object> getComponentProps() {
+        return JSONUtil.toBean(comProps, HashMap.class);
+    }
+    @ApiModelProperty(value = "组件props 属性json")
+    public OtherMenusEntity setComponentProps(Map<String,Object> componentProps) {
+        this.comProps = JSONUtil.toJsonStr(componentProps);;
+        return this;
+    }
 
 }

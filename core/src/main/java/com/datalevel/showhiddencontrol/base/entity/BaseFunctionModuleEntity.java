@@ -1,8 +1,11 @@
 package com.datalevel.showhiddencontrol.base.entity;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.datalevel.showhiddencontrol.other.entity.OtherMenusEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,6 +17,8 @@ import org.apache.ibatis.annotations.Update;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -63,10 +68,12 @@ public class BaseFunctionModuleEntity implements Serializable {
     private String requestMethod;
 
     @ApiModelProperty(value = "页面组件类型json 必有{name,__file,props}")
-    private String componentType;
+    @JsonIgnore
+    private String compType;
 
     @ApiModelProperty(value = "props k-v 对；确定组件props的唯一值，组件是复用的，所以有相同的type，但是组件的props的值不同，这里只保存能够确定组件的关键值来组成K-v的数据，如果权限匹配到这些数据那么就进行管控，确定唯一的方式是referer+type+props的值，当有多个冲突的时候那么增加props的值对")
-    private String componentPropsPair;
+    @JsonIgnore
+    private String comProps;
 
     @ApiModelProperty(value = "排序")
     private Integer sort;
@@ -75,5 +82,23 @@ public class BaseFunctionModuleEntity implements Serializable {
 
     private LocalDateTime createTime;
 
+    @ApiModelProperty(value = "组件type 属性json")
+    public Map<String,Object> getComponentType() {
+        return JSONUtil.toBean(compType, HashMap.class);
+    }
+    @ApiModelProperty(value = "组件type 属性json")
+    public BaseFunctionModuleEntity setComponentType(Map<String,Object> componentType) {
+        this.compType = JSONUtil.toJsonStr(componentType);;
+        return this;
+    }
 
+    @ApiModelProperty(value = "组件props 属性json")
+    public Map<String,Object> getComponentProps() {
+        return JSONUtil.toBean(comProps, HashMap.class);
+    }
+    @ApiModelProperty(value = "组件props 属性json")
+    public BaseFunctionModuleEntity setComponentProps(Map<String,Object> componentProps) {
+        this.comProps = JSONUtil.toJsonStr(componentProps);;
+        return this;
+    }
 }
