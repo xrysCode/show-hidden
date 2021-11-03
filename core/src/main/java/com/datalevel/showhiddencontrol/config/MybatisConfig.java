@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@MapperScan({"com.datalevel.showhiddencontrol.auth.mapper","com.datalevel.showhiddencontrol.base.mapper"})
+@MapperScan({"com.datalevel.showhiddencontrol.auth.mapper","com.datalevel.showhiddencontrol.base.mapper","com.datalevel.showhiddencontrol.other.mapper"})
 public class MybatisConfig {
     // 最新版
     @Bean

@@ -41,9 +41,13 @@ public class SwaggerConfig {
         return createRestApi("基础元数据","com.datalevel.showhiddencontrol.base.controller");
     }
 
-    @Bean(name = "base")
+    @Bean(name = "auth")
     public Docket createRestApiAuth(){
         return createRestApi("权限基础","com.datalevel.showhiddencontrol.auth.controller");
+    }
+    @Bean(name = "other")
+    public Docket createRestApiOther(){
+        return createRestApi("其他非核心模块","com.datalevel.showhiddencontrol.other.controller");
     }
     private Docket createRestApi(String groupName ,String basePackage){
         ParameterBuilder ticketPar = new ParameterBuilder();

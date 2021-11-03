@@ -1,6 +1,6 @@
-package com.datalevel.showhiddencontrol.base.dto;
+package com.datalevel.showhiddencontrol.other.dto;
 
-import com.datalevel.showhiddencontrol.base.entity.BaseFunctionModuleEntity;
+import com.datalevel.showhiddencontrol.other.entity.OtherMenusEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,11 +12,8 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="FunctionModuleTreeDto对象", description="")
-public class FunctionModuleTreeDto extends BaseFunctionModuleEntity {
+@ApiModel(value="MenusTreeDto对象", description="")
+public class MenusTreeDto extends OtherMenusEntity {
     @ApiModelProperty(value = "功能模块子节点")
-    private List<FunctionModuleTreeDto> children;
-
-
-
+    private List<MenusTreeDto> children;
 }
