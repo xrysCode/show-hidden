@@ -16,5 +16,11 @@ public class TreeShiftDto {
     @ApiModelProperty(value = "替换的节点,将下移")
     @NotNull
     private Long replaceId;
+    @ApiModelProperty(value = "替换类型")
+    @NotNull
+    private DropType dropType;
 
+    public enum  DropType{
+        before,after,inner
+    }
 }

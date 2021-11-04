@@ -58,7 +58,7 @@ public class OtherMenusEntity implements Serializable {
     @JsonIgnore
     private String comProps;
 
-    @ApiModelProperty(value = "组件位置")
+    @ApiModelProperty(value = "组件位置路径")
     private String comImport;
 
     @ApiModelProperty(value = "菜单排序")

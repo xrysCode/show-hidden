@@ -1,9 +1,11 @@
 package com.datalevel.showhiddencontrol.common;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
+@ApiModel("ResponseResult")
 public class ResponseResult<T> {
     @ApiModelProperty(value = "响应代码")
     private Integer code;

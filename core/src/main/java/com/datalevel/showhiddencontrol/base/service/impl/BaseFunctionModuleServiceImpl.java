@@ -9,13 +9,13 @@ import com.datalevel.showhiddencontrol.base.dto.TreeShiftDto;
 import com.datalevel.showhiddencontrol.base.entity.BaseFunctionModuleEntity;
 import com.datalevel.showhiddencontrol.base.mapper.BaseFunctionModuleMapper;
 import com.datalevel.showhiddencontrol.base.service.IBaseFunctionModuleService;
-import com.datalevel.showhiddencontrol.core.dto.WebTreeDto;
-import com.datalevel.showhiddencontrol.core.entity.WebComponentTreeEntity;
+import com.datalevel.showhiddencontrol.config.BusinessException;
+import com.google.common.collect.Lists;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,24 +53,56 @@ public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModul
     @Override
     @Transactional
     public void shiftFunctionModule(TreeShiftDto treeShiftDto) {
+        if(treeShiftDto.getReplaceId().equals(treeShiftDto.getDraggingId())){
+            throw new BusinessException("移动的节点相同");
+        }
         BaseFunctionModuleEntity draggingEntity = baseMapper.selectById(treeShiftDto.getDraggingId());
         BaseFunctionModuleEntity replaceEntity = baseMapper.selectById(treeShiftDto.getReplaceId());
 
-        LambdaQueryWrapper<BaseFunctionModuleEntity> queryWrapper = new QueryWrapper<BaseFunctionModuleEntity>().lambda()
-                .eq(BaseFunctionModuleEntity::getParentId, replaceEntity.getParentId())
-                .orderByAsc(BaseFunctionModuleEntity::getSort);
-        List<BaseFunctionModuleEntity> replaceEntityList = baseMapper.selectList(queryWrapper);
 
-        int replaceIndex=0;
-        for (int i = 0; i < replaceEntityList.size(); i++,replaceIndex++) {//只需要移动替换节点的排序，移出节点的顺序按原有顺序没有变化。
-            BaseFunctionModuleEntity moduleEntity = replaceEntityList.get(i);
-            if(moduleEntity.getId().equals(treeShiftDto.getReplaceId())){
-                draggingEntity.setSort(replaceIndex).setParentId(replaceEntity.getParentId()).setCreateTime(null).setCreateUser(null);
-                replaceIndex++;
-            }
-            moduleEntity.setSort(replaceIndex).setCreateTime(null).setCreateUser(null);
+        TreeShiftDto.@NotNull DropType dropType = treeShiftDto.getDropType();
+        LambdaQueryWrapper<BaseFunctionModuleEntity> queryWrapper = new QueryWrapper<BaseFunctionModuleEntity>().lambda()
+                .orderByAsc(BaseFunctionModuleEntity::getSort);
+        List<BaseFunctionModuleEntity> replaceEntityList =null;
+        if(dropType==TreeShiftDto. DropType.inner){
+            queryWrapper.eq(BaseFunctionModuleEntity::getParentId, replaceEntity.getId());// 内部位于第一个
+            replaceEntityList = baseMapper.selectList(queryWrapper);
+            draggingEntity.setParentId(replaceEntity.getId()).setSort(0).setCreateTime(null).setCreateUser(null);
+        }else {
+            queryWrapper.eq(BaseFunctionModuleEntity::getParentId, replaceEntity.getParentId());
+            replaceEntityList = baseMapper.selectList(queryWrapper);
+            draggingEntity.setParentId(replaceEntity.getParentId()).setCreateTime(null).setCreateUser(null);
         }
-        replaceEntityList.add(draggingEntity.getSort(),draggingEntity);
+        LinkedList<BaseFunctionModuleEntity> updateData = Lists.newLinkedList();
+        updateData.add(draggingEntity);
+        for (int i = 0, replaceIndex=0; i < replaceEntityList.size(); i++,replaceIndex++) {//只需要移动替换节点的排序，移出节点的顺序按原有顺序没有变化。
+            BaseFunctionModuleEntity moduleEntity = replaceEntityList.get(i);
+            switch (dropType){
+                case inner:
+                    moduleEntity.setSort(replaceIndex+1).setCreateTime(null).setCreateUser(null);
+                    break;
+                case before://之前替代本节点
+                    if(moduleEntity.getId().equals(treeShiftDto.getReplaceId())) {//替换的节点
+                        draggingEntity.setSort(replaceIndex);
+                        moduleEntity.setSort(++replaceIndex).setCreateTime(null).setCreateUser(null);
+                    }else {
+                        moduleEntity.setSort(replaceIndex).setCreateTime(null).setCreateUser(null);
+                    }
+                    break;
+                case after:
+                    if(moduleEntity.getId().equals(treeShiftDto.getReplaceId())) {//替换的节点
+                        moduleEntity.setSort(replaceIndex).setCreateTime(null).setCreateUser(null);
+                        draggingEntity.setSort(++replaceIndex);//其他节点要往后移
+                    }else {
+                        moduleEntity.setSort(replaceIndex).setCreateTime(null).setCreateUser(null);
+                    }
+                    break;
+            }
+            if(moduleEntity.getId()!=draggingEntity.getId()){// 同级中不能包含拖拽的节点 因为已经添加了
+                updateData.add(moduleEntity);// 全量更新因为可能不连续
+            }
+        }
         updateBatchById(replaceEntityList);
+
     }
 }
