@@ -1,0 +1,80 @@
+package com.purcotton.scm.base.rds.pojo;
+
+import com.purcotton.scm.base.rds.util.UnderlineCamelUtils;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+/**
+ * 表信息，关联到当前字段信息
+ *
+ */
+@Data
+@Accessors(chain = true)
+public class TableInfoEntity implements Cloneable{
+    /**
+     * 数据库表名
+     */
+    private String name;
+    /**
+     * 转驼峰表名
+     */
+    private String propertyName;
+    /**
+     * 注解
+     */
+    private String comment;
+
+    /**
+     * k 表示表字段名，v更全的信息
+     */
+    private List<TableFieldEntity> fieldList;
+
+    /**
+     * k 数据库字段名，v更全的信息
+     */
+    private Map<String,TableFieldEntity> fieldMap;
+    /**
+     * k 转驼峰的属性字段名，v更全的信息
+     */
+    private Map<String,TableFieldEntity> fieldPropertyMap;
+
+    public TableInfoEntity setName(String name) {
+        this.name = name;
+        propertyName= UnderlineCamelUtils.removePrefixAndCamel(name);
+        return this;
+    }
+
+    public Map<String, TableFieldEntity> getFieldMap() {
+        if(fieldMap==null){
+            synchronized (this){
+                if(fieldMap!=null){
+                    fieldMap=fieldList.stream().collect(
+                            Collectors.toMap(TableFieldEntity::getPropertyName, Function.identity()));
+                }
+            }
+        }
+        return fieldMap;
+    }
+
+    public Map<String, TableFieldEntity> getFieldPropertyMap() {
+        if(fieldPropertyMap==null){
+            synchronized (this){
+                if(fieldPropertyMap!=null){
+                    fieldPropertyMap=fieldList.stream().collect(
+                            Collectors.toMap(TableFieldEntity::getPropertyName, Function.identity()));
+                }
+            }
+        }
+        return fieldPropertyMap;
+    }
+
+    @Override
+    public TableInfoEntity clone() throws CloneNotSupportedException {
+        return (TableInfoEntity)super.clone();
+    }
+}
