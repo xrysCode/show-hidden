@@ -1,15 +1,10 @@
 package com.datalevel.showhiddencontrol.base.controller;
 
 
-import com.datalevel.showhiddencontrol.base.dto.ApplicationServerDto;
 import com.datalevel.showhiddencontrol.base.dto.FunctionModuleTreeDto;
 import com.datalevel.showhiddencontrol.base.dto.TreeShiftDto;
-import com.datalevel.showhiddencontrol.base.entity.BaseApplicationEntity;
 import com.datalevel.showhiddencontrol.base.entity.BaseFunctionModuleEntity;
-import com.datalevel.showhiddencontrol.base.service.IBaseApplicationService;
 import com.datalevel.showhiddencontrol.base.service.IBaseFunctionModuleService;
-import com.datalevel.showhiddencontrol.common.RequestPage;
-import com.datalevel.showhiddencontrol.common.ResponsePage;
 import com.datalevel.showhiddencontrol.common.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,7 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * <p>
@@ -67,7 +61,7 @@ public class BaseFunctionModuleController {
     @DeleteMapping
     @ApiOperation(value = "删除选中的节点")
     public ResponseResult<Boolean> delFunctionModule(@RequestBody List<Long> ids){
-        iBaseFunctionModuleService.removeByIds(ids);
+        iBaseFunctionModuleService.delFunctionModule(ids);
         return new ResponseResult<>(true);
     }
 }

@@ -20,4 +20,6 @@ public interface IBaseFunctionModuleService extends IService<BaseFunctionModuleE
     List<FunctionModuleTreeDto> queryByAppId(Long appId);
 
     void shiftFunctionModule(TreeShiftDto treeShiftDto);
+
+    void delFunctionModule(List<Long> ids);
 }

@@ -1,5 +1,7 @@
 package com.datalevel.showhiddencontrol.base.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,14 +11,13 @@ import lombok.experimental.Accessors;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Update;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * <p>
- * 微服务粒度
+ * 服务表
  * </p>
  *
  * @author xry
@@ -26,33 +27,25 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("base_application")
-@ApiModel(value="BaseApplicationEntity对象", description="微服务粒度")
+@ApiModel(value="BaseApplicationEntity对象", description="应用表")
 public class BaseApplicationEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(groups = Update.class)
+    @TableId(value = "id", type = IdType.AUTO)
+    @NotNull(groups = {Update.class})
     private Long id;
-    @NotNull(groups ={Insert.class,Update.class} )
-    private Long serviceId;
 
-    @ApiModelProperty(value = "app服务标记,新增自动生成")
-    private String appCode;
-
-    @ApiModelProperty(value = "子服务名")
-    @NotBlank(groups ={Insert.class,Update.class} )
+    @NotNull(groups = {Update.class, Insert.class})
+    @ApiModelProperty(value = "应用名")
     private String appName;
 
-    @ApiModelProperty(value = "模块服务名")
+    @ApiModelProperty(value = "服务简述")
     private String appDesc;
-
-    @ApiModelProperty(value = "回调地址")
-    @NotBlank(groups ={Insert.class,Update.class} )
-    private String callBackUrl;
 
     private LocalDateTime createTime;
 
-    @ApiModelProperty(value = "创建人")
+    @ApiModelProperty(value = "创建者")
     private String createUser;
 
 

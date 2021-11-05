@@ -4,19 +4,25 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.datalevel.showhiddencontrol.auth.mapper.AuthFieldMapper;
+import com.datalevel.showhiddencontrol.auth.mapper.AuthFunMapper;
 import com.datalevel.showhiddencontrol.base.dto.FunctionModuleTreeDto;
 import com.datalevel.showhiddencontrol.base.dto.TreeShiftDto;
 import com.datalevel.showhiddencontrol.base.entity.BaseFunctionModuleEntity;
+import com.datalevel.showhiddencontrol.base.mapper.BaseFunFieldMapper;
 import com.datalevel.showhiddencontrol.base.mapper.BaseFunctionModuleMapper;
 import com.datalevel.showhiddencontrol.base.service.IBaseFunctionModuleService;
 import com.datalevel.showhiddencontrol.config.BusinessException;
 import com.google.common.collect.Lists;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +35,12 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModuleMapper, BaseFunctionModuleEntity> implements IBaseFunctionModuleService {
+    @Autowired
+    AuthFunMapper authFunMapper;
+    @Autowired
+    BaseFunFieldMapper baseFunFieldMapper;
+    @Autowired
+    AuthFieldMapper authFieldMapper;
 
     @Override
     public List<FunctionModuleTreeDto> queryByAppId(Long appId) {
@@ -104,5 +116,17 @@ public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModul
         }
         updateBatchById(replaceEntityList);
 
+    }
+
+    @Override
+    public void delFunctionModule(List<Long> ids) {
+        Map<String, Object> selectMap = new HashMap<>();
+        ids.stream().forEach(funId->{
+            selectMap.put("fun_id",funId);
+            baseFunFieldMapper.deleteByMap(selectMap);
+            authFunMapper.deleteByMap(selectMap);
+            authFieldMapper.deleteByMap(selectMap);
+        });
+        baseMapper.deleteBatchIds(ids);
     }
 }

@@ -1,7 +1,5 @@
 package com.datalevel.showhiddencontrol.base.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,13 +9,14 @@ import lombok.experimental.Accessors;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Update;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * <p>
- * 服务表
+ * 微服务粒度
  * </p>
  *
  * @author xry
@@ -26,26 +25,34 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("base_service_info")
-@ApiModel(value="BaseServiceInfoEntity对象", description="服务表")
-public class BaseServiceInfoEntity implements Serializable {
+@TableName("base_service")
+@ApiModel(value="BaseServiceEntity对象", description="微服务粒度")
+public class BaseServiceEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    @NotNull(groups = {Update.class})
+    @NotNull(groups = Update.class)
     private Long id;
+    @NotNull(groups ={Insert.class,Update.class} )
+    private Long appId;
 
-    @NotNull(groups = {Update.class, Insert.class})
-    @ApiModelProperty(value = "服务名")
+    @ApiModelProperty(value = "app服务标记,新增自动生成")
+    private String serviceCode;
+
+    @ApiModelProperty(value = "子服务名")
+    @NotBlank(groups ={Insert.class,Update.class} )
     private String serviceName;
 
-    @ApiModelProperty(value = "服务简述")
+    @ApiModelProperty(value = "模块服务名")
     private String serviceDesc;
+
+    @ApiModelProperty(value = "回调地址")
+    @NotBlank(groups ={Insert.class,Update.class} )
+    private String callBackUrl;
 
     private LocalDateTime createTime;
 
-    @ApiModelProperty(value = "创建者")
+    @ApiModelProperty(value = "创建人")
     private String createUser;
 
 

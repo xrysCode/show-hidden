@@ -1,7 +1,6 @@
-package com.purcotton.scm.base.rds.pojo;
+package com.datalevel.showhiddencontrol.sdk;
 
 import com.mysql.cj.MysqlType;
-import com.purcotton.scm.base.rds.util.UnderlineCamelUtils;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -9,7 +8,7 @@ import java.io.Serializable;
 
 @Data
 @Accessors(chain = true)
-public class TableFieldEntity implements Serializable {
+public class TableFieldDto implements Serializable {
     /**
      * 字段
      */
@@ -55,13 +54,13 @@ public class TableFieldEntity implements Serializable {
     private MysqlType columnType;//类型
 
 
-    public TableFieldEntity setField(String field) {
+    public TableFieldDto setField(String field) {
         this.field = field;
-        this.propertyName= UnderlineCamelUtils.removePrefixAndCamel(field);
+//        this.propertyName= UnderlineCamelUtils.removePrefixAndCamel(field);
         return this;
     }
 
-    public TableFieldEntity setType(String type) {
+    public TableFieldDto setType(String type) {
         this.type = type;
         String fieldType=type.replaceAll("\\(.+","");
         this.columnType=MysqlType.getByName(fieldType);

@@ -1,9 +1,6 @@
-package com.purcotton.scm.base.rds.service;
+package com.datalevel.showhiddencontrol.sdk;
 
 import com.google.common.collect.Lists;
-import com.purcotton.scm.base.common.exception.BusinessException;
-import com.purcotton.scm.base.rds.pojo.TableFieldEntity;
-import com.purcotton.scm.base.rds.pojo.TableInfoEntity;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
@@ -15,30 +12,30 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
-public class LocalTableFieldService {
+public class TableFieldScan {
     protected DataSource dataSource;
     //所有本地表信息 本项目的所有表
-    protected static List<TableInfoEntity> localTableList;
+    protected static List<TableInfoDto> localTableList;
 
-    public LocalTableFieldService(DataSource dataSource) {
+    public TableFieldScan(DataSource dataSource) {
         this.dataSource = dataSource;
         localTableList=parseLocalTableInfo();
     }
 
-    private List<TableInfoEntity> parseLocalTableInfo() {
+    private List<TableInfoDto> parseLocalTableInfo() {
         try (Connection connection=dataSource.getConnection()) {
             try (PreparedStatement preparedTableStatement = connection.prepareStatement("show table status");
                  ResultSet resultTableSet = preparedTableStatement.executeQuery()){
-                List<TableInfoEntity> tableInfoList = Lists.newArrayList();
+                List<TableInfoDto> tableInfoList = Lists.newArrayList();
                 while (resultTableSet.next()){
-                    TableInfoEntity tableInfoEntity = new TableInfoEntity()
+                    TableInfoDto tableInfoDto = new TableInfoDto()
                             .setName(resultTableSet.getString("name"))
                             .setComment(resultTableSet.getString("comment"));
-                    try (PreparedStatement preparedFieldStatement = connection.prepareStatement("show full fields from "+tableInfoEntity.getName());
+                    try (PreparedStatement preparedFieldStatement = connection.prepareStatement("show full fields from "+ tableInfoDto.getName());
                          ResultSet resultFieldSet = preparedFieldStatement.executeQuery()){
-                        List<TableFieldEntity> tableFieldList = Lists.newArrayList();
+                        List<TableFieldDto> tableFieldList = Lists.newArrayList();
                         while (resultFieldSet.next()){
-                            TableFieldEntity tableFieldEntity = new TableFieldEntity()
+                            TableFieldDto tableFieldDto = new TableFieldDto()
                                     .setField(resultFieldSet.getString("field"))
                                     .setType(resultFieldSet.getString("type"))
                                     .setCollation(resultFieldSet.getString("collation"))
@@ -47,26 +44,25 @@ public class LocalTableFieldService {
                                     .setDefaultValue(resultFieldSet.getString("default"))
                                     .setExtra(resultFieldSet.getString("extra"))
                                     .setComment(resultFieldSet.getString("comment"));
-                            tableFieldList.add(tableFieldEntity);
+                            tableFieldList.add(tableFieldDto);
                         }
-                        tableInfoEntity.setFieldList(tableFieldList);
+                        tableInfoDto.setFieldList(tableFieldList);
                     }
-                    tableInfoList.add(tableInfoEntity);
+                    tableInfoList.add(tableInfoDto);
                 }
                 return tableInfoList;
             }
         } catch (SQLException e) {
-            log.error("变式获取表sql异常",e);
-            throw new RuntimeException("变式获取表sql异常",e);
+            throw new RuntimeException("解析数据库表异常",e);
         }
     }
     /**
      * 所有本地的表信息 与webKey无关
      * @return
      */
-    public List<TableInfoEntity> getLocalTableInfo(){
+    public List<TableInfoDto> getLocalTableInfo(){
         if(localTableList==null){
-            throw new RuntimeException("表配置没有准备好请使用TableFieldService bean来获取！");
+            throw new RuntimeException("表配置没有准备好！");
         }
         return Collections.unmodifiableList(localTableList);
     }

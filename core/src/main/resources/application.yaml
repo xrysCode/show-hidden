@@ -9,6 +9,8 @@ spring:
     url: jdbc:mysql://47.112.148.138:30306/auth_control?useUnicode=true&useSSL=false&serverTimezone=GMT
     username: root
     password: 123456
+#  application:
+#    name:
 #springfox:
 #  documentation:
 #    swagger-ui:
@@ -17,3 +19,6 @@ spring:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+auth:
+  code: auth-centre

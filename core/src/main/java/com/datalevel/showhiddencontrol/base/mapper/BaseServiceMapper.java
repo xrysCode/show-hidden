@@ -1,7 +1,7 @@
 package com.datalevel.showhiddencontrol.base.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.datalevel.showhiddencontrol.base.entity.BaseServiceInfoEntity;
+import com.datalevel.showhiddencontrol.base.entity.BaseServiceEntity;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.datalevel.showhiddencontrol.base.entity.BaseServiceInfoEntity;
  * @author xry
  * @since 2021-10-30
  */
-public interface BaseServiceInfoMapper extends BaseMapper<BaseServiceInfoEntity> {
+public interface BaseServiceMapper extends BaseMapper<BaseServiceEntity> {
 
 }
