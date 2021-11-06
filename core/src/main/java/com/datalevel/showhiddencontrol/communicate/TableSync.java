@@ -17,7 +17,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -47,49 +49,56 @@ public class TableSync {
         LambdaQueryWrapper<BaseTableFieldInfoEntity> queryWrapper1 = new QueryWrapper<BaseTableFieldInfoEntity>()
                 .lambda().eq(BaseTableFieldInfoEntity::getServiceId, serviceEntity.getId());
 
-        Map<Boolean, Map<String, BaseTableFieldInfoEntity>> allMap = iBaseTableFieldInfoService.getBaseMapper().selectList(queryWrapper1).stream()
-                .collect(Collectors.groupingBy(tableFieldInfoEntity -> tableFieldInfoEntity.getParentId() == null,
-                        Collectors.toMap(BaseTableFieldInfoEntity::getTableFieldName, Function.identity())));
-        Map<String, BaseTableFieldInfoEntity> tableMap =allMap.getOrDefault(true, Maps.newHashMap());
-        Map<String, BaseTableFieldInfoEntity> fieldMap = allMap.getOrDefault(false,Maps.newHashMap());
-        fieldMap.forEach((k,v)->{});///这里有问题
-
+        Map<Boolean, List<BaseTableFieldInfoEntity>> allMap = iBaseTableFieldInfoService.getBaseMapper().selectList(queryWrapper1).stream()
+                .collect(Collectors.groupingBy(tableFieldInfoEntity -> tableFieldInfoEntity.getParentId() == null));
+        Map<Long, BaseTableFieldInfoEntity> tableIdMap = new HashMap<>();
+        Map<String, BaseTableFieldInfoEntity> tableNameMap = new HashMap<>();
+        allMap.getOrDefault(true, Lists.newLinkedList()).forEach((v)->{
+            tableIdMap.put(v.getId(),v);
+            tableNameMap.put(v.getDbTableField(),v);
+        });
+        Map<String, BaseTableFieldInfoEntity> fieldNameMap = new HashMap<>();
+        allMap.getOrDefault(false,Lists.newLinkedList()).forEach((v)->{
+            fieldNameMap.put(String.format("%s:%s",tableIdMap.get(v.getParentId()).getDbTableField(),v.getDbTableField()),v);
+        });
 
         LinkedList<BaseTableFieldInfoEntity> updateTableInfoList = Lists.newLinkedList();
         @NotNull(groups = Update.class) Long serviceId = serviceEntity.getId();
         tableScanDto.getTableInfoList().stream().forEach(tableInfoDto -> {
-            BaseTableFieldInfoEntity tableInfoEntity = tableMap.remove(tableInfoDto.getName());
+            BaseTableFieldInfoEntity tableInfoEntity = tableNameMap.remove(tableInfoDto.getName());
             if(tableInfoEntity==null){
                 tableInfoEntity = new BaseTableFieldInfoEntity()
                         .setParentId(null).setServiceId(serviceId).setIsDeprecated(false)
-                        .setTableFieldName(tableInfoDto.getName())
-                        .setComment(tableInfoDto.getComment());
-                iBaseTableFieldInfoService.save(tableInfoEntity);
+                        .setDbTableField(tableInfoDto.getName())
+                        .setDbComment(tableInfoDto.getComment());
+                iBaseTableFieldInfoService.save(tableInfoEntity);//提前保持以便获取id
             }else {
-                tableInfoEntity.setComment(tableInfoDto.getComment()).setIsDeprecated(false).setCreateUser(null).setCreateTime(null);
+                tableInfoEntity.setDbComment(tableInfoDto.getComment()).setIsDeprecated(false).setCreateUser(null).setCreateTime(null);
                 updateTableInfoList.add(tableInfoEntity);
             }
 
             Long tableId = tableInfoEntity.getId();
+            String tableName = tableInfoEntity.getDbTableField();
             tableInfoDto.getFieldList().forEach(tableFieldDto -> {
-                BaseTableFieldInfoEntity fieldInfoEntity = fieldMap.remove(tableFieldDto.getField());
+                String key=String.format("%s:%s",tableName,tableFieldDto.getField());
+                BaseTableFieldInfoEntity fieldInfoEntity = fieldNameMap.remove(key);
                 if(fieldInfoEntity==null){
                     fieldInfoEntity = new BaseTableFieldInfoEntity()
                             .setParentId(tableId).setServiceId(serviceId).setIsDeprecated(false)
-                            .setTableFieldName(tableInfoDto.getName())
-                            .setComment(tableInfoDto.getComment());
+                            .setDbTableField(tableFieldDto.getField())
+                            .setDbComment(tableFieldDto.getComment());
                     iBaseTableFieldInfoService.save(fieldInfoEntity);
                 }else {
-                    fieldInfoEntity.setComment(tableInfoDto.getComment()).setIsDeprecated(false).setCreateUser(null).setCreateTime(null);
+                    fieldInfoEntity.setDbComment(tableFieldDto.getComment()).setIsDeprecated(false).setCreateUser(null).setCreateTime(null);
                     updateTableInfoList.add(fieldInfoEntity);
                 }
             });
         });
-        tableMap.forEach((k,v)->{
+        tableNameMap.forEach((k,v)->{
             v.setIsDeprecated(true).setCreateUser(null).setCreateTime(null);
             updateTableInfoList.add(v);
         });
-        fieldMap.forEach((k,v)->{
+        fieldNameMap.forEach((k,v)->{
             v.setIsDeprecated(true).setCreateUser(null).setCreateTime(null);
             updateTableInfoList.add(v);
         });

@@ -1,6 +1,6 @@
 package com.datalevel.showhiddencontrol.communicate.dto;
 
-import com.datalevel.showhiddencontrol.sdk.TableInfoDto;
+import com.datalevel.showhiddencontrol.sdk.table.TableInfoDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

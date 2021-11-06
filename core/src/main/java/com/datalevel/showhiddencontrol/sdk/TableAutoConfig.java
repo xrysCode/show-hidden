@@ -2,11 +2,11 @@ package com.datalevel.showhiddencontrol.sdk;
 
 import com.datalevel.showhiddencontrol.communicate.TableSync;
 import com.datalevel.showhiddencontrol.communicate.dto.TableScanDto;
+import com.datalevel.showhiddencontrol.sdk.table.TableFieldScan;
+import com.datalevel.showhiddencontrol.sdk.table.TableInfoDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,7 +21,7 @@ public class TableAutoConfig {
     @Autowired
     TableSync tableSync;
 
-//    @Bean
+    @Bean
     public TableFieldScan localTableFieldScan(DataSource dataSource){
         TableFieldScan tableFieldScan = new TableFieldScan(dataSource);
         List<TableInfoDto> tableInfo = tableFieldScan.getLocalTableInfo();

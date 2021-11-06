@@ -1,4 +1,4 @@
-package com.datalevel.showhiddencontrol.sdk;
+package com.datalevel.showhiddencontrol.sdk.table;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

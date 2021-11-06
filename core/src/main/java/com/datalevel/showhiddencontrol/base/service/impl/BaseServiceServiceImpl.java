@@ -73,7 +73,7 @@ public class BaseServiceServiceImpl extends ServiceImpl<BaseServiceMapper, BaseS
             if(StrUtil.isNotBlank(message)){
                 throw new BusinessException(String.format("请先模块功能:[%s]。",message));
             }
-            message = baseTableFieldInfoMapper.selectByMap(selectMap).stream().map(BaseTableFieldInfoEntity::getTableFieldName)
+            message = baseTableFieldInfoMapper.selectByMap(selectMap).stream().map(BaseTableFieldInfoEntity::getDbTableField)
                     .distinct()
                     .collect(Collectors.joining(","));
             if(StrUtil.isNotBlank(message)){
