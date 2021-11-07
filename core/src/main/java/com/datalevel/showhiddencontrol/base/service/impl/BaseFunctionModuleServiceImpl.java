@@ -1,16 +1,20 @@
 package com.datalevel.showhiddencontrol.base.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.datalevel.showhiddencontrol.auth.mapper.AuthFieldMapper;
 import com.datalevel.showhiddencontrol.auth.mapper.AuthFunMapper;
+import com.datalevel.showhiddencontrol.base.dto.FunctionModuleSaveDto;
 import com.datalevel.showhiddencontrol.base.dto.FunctionModuleTreeDto;
 import com.datalevel.showhiddencontrol.base.dto.TreeShiftDto;
+import com.datalevel.showhiddencontrol.base.entity.BaseFunFieldEntity;
 import com.datalevel.showhiddencontrol.base.entity.BaseFunctionModuleEntity;
 import com.datalevel.showhiddencontrol.base.mapper.BaseFunFieldMapper;
 import com.datalevel.showhiddencontrol.base.mapper.BaseFunctionModuleMapper;
+import com.datalevel.showhiddencontrol.base.service.IBaseFunFieldService;
 import com.datalevel.showhiddencontrol.base.service.IBaseFunctionModuleService;
 import com.datalevel.showhiddencontrol.config.BusinessException;
 import com.google.common.collect.Lists;
@@ -38,9 +42,10 @@ public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModul
     @Autowired
     AuthFunMapper authFunMapper;
     @Autowired
-    BaseFunFieldMapper baseFunFieldMapper;
+    IBaseFunFieldService iBaseFunFieldService;
     @Autowired
     AuthFieldMapper authFieldMapper;
+
 
     @Override
     public List<FunctionModuleTreeDto> queryByAppId(Long appId) {
@@ -119,14 +124,36 @@ public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModul
     }
 
     @Override
+    @Transactional
     public void delFunctionModule(List<Long> ids) {
         Map<String, Object> selectMap = new HashMap<>();
         ids.stream().forEach(funId->{
             selectMap.put("fun_id",funId);
-            baseFunFieldMapper.deleteByMap(selectMap);
+            iBaseFunFieldService.removeByMap(selectMap);
             authFunMapper.deleteByMap(selectMap);
             authFieldMapper.deleteByMap(selectMap);
         });
         baseMapper.deleteBatchIds(ids);
+    }
+
+    @Override
+    @Transactional
+    public void saveRelation(FunctionModuleSaveDto functionModuleSaveDto) {
+        if(functionModuleSaveDto.getId()==null){
+            save(functionModuleSaveDto);
+        }else{
+            updateById(functionModuleSaveDto);
+        }
+        LambdaQueryWrapper<BaseFunFieldEntity> queryWrapper = new QueryWrapper<BaseFunFieldEntity>().lambda()
+                .eq(BaseFunFieldEntity::getFunId, functionModuleSaveDto.getId());
+        iBaseFunFieldService.remove(queryWrapper);
+        if(CollectionUtil.isNotEmpty(functionModuleSaveDto.getFieldIds())){
+
+            List<BaseFunFieldEntity> baseFunFieldEntityList = functionModuleSaveDto.getFieldIds().stream().map(fieldId ->
+                    new BaseFunFieldEntity().setFunId(functionModuleSaveDto.getId())
+                            .setFieldId(fieldId)
+            ).collect(Collectors.toList());
+            iBaseFunFieldService.saveBatch(baseFunFieldEntityList);
+        }
     }
 }

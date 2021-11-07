@@ -1,10 +1,23 @@
 package com.datalevel.showhiddencontrol.auth.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.datalevel.showhiddencontrol.auth.entity.AuthFieldEntity;
+import com.datalevel.showhiddencontrol.auth.entity.AuthFunEntity;
 import com.datalevel.showhiddencontrol.auth.entity.AuthGroupEntity;
 import com.datalevel.showhiddencontrol.auth.mapper.AuthGroupMapper;
+import com.datalevel.showhiddencontrol.auth.service.IAuthFieldService;
+import com.datalevel.showhiddencontrol.auth.service.IAuthFunService;
 import com.datalevel.showhiddencontrol.auth.service.IAuthGroupService;
+import com.datalevel.showhiddencontrol.other.entity.UserAuthEntity;
+import com.datalevel.showhiddencontrol.other.service.IUserAuthService;
+import com.datalevel.showhiddencontrol.other.service.IUserInfoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * <p>
@@ -16,5 +29,28 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AuthGroupServiceImpl extends ServiceImpl<AuthGroupMapper, AuthGroupEntity> implements IAuthGroupService {
+    @Autowired
+    IAuthFunService iAuthFunService;
+    @Autowired
+    IAuthFieldService iAuthFieldService;
+    @Autowired
+    IUserAuthService iUserAuthService;
 
+    @Override
+    @Transactional
+    public void delApp(List<Long> ids) {
+        LambdaQueryWrapper<AuthFunEntity> queryAuthFunWrapper = new QueryWrapper<AuthFunEntity>().lambda()
+                .in(AuthFunEntity::getAuthId, ids);
+        iAuthFunService.remove(queryAuthFunWrapper);
+
+        LambdaQueryWrapper<AuthFieldEntity> queryAuthFieldWrapper = new QueryWrapper<AuthFieldEntity>().lambda()
+                .in(AuthFieldEntity::getAuthId, ids);
+        iAuthFieldService.remove(queryAuthFieldWrapper);
+
+        LambdaQueryWrapper<UserAuthEntity> queryUserAuthWrapper = new QueryWrapper<UserAuthEntity>().lambda()
+                .in(UserAuthEntity::getAuthId, ids);
+        iUserAuthService.remove(queryUserAuthWrapper);
+
+        removeByIds(ids);
+    }
 }

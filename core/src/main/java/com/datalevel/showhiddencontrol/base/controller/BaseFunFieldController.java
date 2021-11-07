@@ -1,8 +1,19 @@
 package com.datalevel.showhiddencontrol.base.controller;
 
 
+import com.datalevel.showhiddencontrol.base.entity.BaseServiceEntity;
+import com.datalevel.showhiddencontrol.common.ResponseResult;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiSort;
+import org.apache.ibatis.annotations.Insert;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 /**
  * <p>
@@ -13,7 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2021-10-30
  */
 @RestController
-@RequestMapping("/base/base-fun-field-entity")
+@RequestMapping("/base/fun-field")
+@ApiSort(20)
+@Api(tags = "功能表关系维护")
 public class BaseFunFieldController {
-
+//    PostMapping
+//    @ApiOperation(value = "添加子服务")
+//    public ResponseResult<Boolean> addServe(@RequestBody @Validated(Insert.class) BaseServiceEntity request){
+//        request.setServiceCode(UUID.randomUUID().toString());
+//        iBaseServiceService.save(request);
+//        return new ResponseResult<>(true);
+//    }
 }

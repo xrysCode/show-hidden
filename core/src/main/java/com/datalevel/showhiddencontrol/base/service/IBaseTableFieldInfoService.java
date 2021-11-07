@@ -1,7 +1,10 @@
 package com.datalevel.showhiddencontrol.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.datalevel.showhiddencontrol.base.dto.TableFieldInfoDto;
 import com.datalevel.showhiddencontrol.base.entity.BaseTableFieldInfoEntity;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.datalevel.showhiddencontrol.base.entity.BaseTableFieldInfoEntity;
  */
 public interface IBaseTableFieldInfoService extends IService<BaseTableFieldInfoEntity> {
 
+    List<TableFieldInfoDto> getTableFieldInfo(Long serviceId, Long parentId);
 }

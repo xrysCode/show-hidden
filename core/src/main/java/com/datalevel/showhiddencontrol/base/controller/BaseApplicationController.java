@@ -37,7 +37,7 @@ public class BaseApplicationController {
     IBaseApplicationService iBaseApplicationService;
 
     @GetMapping
-    @ApiOperation(value = "获取服务")
+    @ApiOperation(value = "获取应用")
     public ResponseResult<ResponsePage<BaseApplicationEntity>> getByPage(RequestPage requestPage){
         Page<BaseApplicationEntity> page = Page.of(requestPage.getCurrent(), requestPage.getSize());
         QueryWrapper queryWrapper = new QueryWrapper();
@@ -46,13 +46,13 @@ public class BaseApplicationController {
         return new ResponseResult<>(BeanUtil.copyProperties(page,ResponsePage.class));
     }
     @PostMapping
-    @ApiOperation(value = "添加服务")
+    @ApiOperation(value = "添加应用")
     public ResponseResult<Boolean> addApp(@RequestBody @Validated(Insert.class) BaseApplicationEntity request){
         iBaseApplicationService.save(request);
         return new ResponseResult<>(true);
     }
     @PutMapping
-    @ApiOperation(value = "修改服务")
+    @ApiOperation(value = "修改应用")
     public ResponseResult<Boolean> updateApp(@RequestBody @Validated(Update.class) BaseApplicationEntity request){
         iBaseApplicationService.updateById(request);
         return new ResponseResult<>(true);
@@ -60,7 +60,7 @@ public class BaseApplicationController {
 
 
     @DeleteMapping
-    @ApiOperation(value = "删除服务")
+    @ApiOperation(value = "删除应用")
     public ResponseResult<Boolean> delApp(@RequestBody List<Long> ids){
         iBaseApplicationService.delApp(ids);
         return new ResponseResult<>(true);

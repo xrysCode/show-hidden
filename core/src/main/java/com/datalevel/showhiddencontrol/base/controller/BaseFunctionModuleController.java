@@ -1,6 +1,7 @@
 package com.datalevel.showhiddencontrol.base.controller;
 
 
+import com.datalevel.showhiddencontrol.base.dto.FunctionModuleSaveDto;
 import com.datalevel.showhiddencontrol.base.dto.FunctionModuleTreeDto;
 import com.datalevel.showhiddencontrol.base.dto.TreeShiftDto;
 import com.datalevel.showhiddencontrol.base.entity.BaseFunctionModuleEntity;
@@ -40,14 +41,14 @@ public class BaseFunctionModuleController {
     }
     @PostMapping
     @ApiOperation(value = "添加功能模块")
-    public ResponseResult<Boolean> addFunctionModule(@RequestBody @Validated(Insert.class) BaseFunctionModuleEntity request){
-        iBaseFunctionModuleService.save(request);
+    public ResponseResult<Boolean> addFunctionModule(@RequestBody @Validated(Insert.class) FunctionModuleSaveDto request){
+        iBaseFunctionModuleService.saveRelation(request);
         return new ResponseResult<>(true);
     }
     @PutMapping
     @ApiOperation(value = "修改功能模块")
-    public ResponseResult<Boolean> updateFunctionModule(@RequestBody @Validated(Update.class) BaseFunctionModuleEntity request){
-        iBaseFunctionModuleService.updateById(request);
+    public ResponseResult<Boolean> updateFunctionModule(@RequestBody @Validated(Update.class) FunctionModuleSaveDto request){
+        iBaseFunctionModuleService.saveRelation(request);
         return new ResponseResult<>(true);
     }
 

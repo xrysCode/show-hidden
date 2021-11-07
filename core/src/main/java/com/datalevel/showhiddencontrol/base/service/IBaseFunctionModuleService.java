@@ -1,6 +1,7 @@
 package com.datalevel.showhiddencontrol.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.datalevel.showhiddencontrol.base.dto.FunctionModuleSaveDto;
 import com.datalevel.showhiddencontrol.base.dto.FunctionModuleTreeDto;
 import com.datalevel.showhiddencontrol.base.dto.TreeShiftDto;
 import com.datalevel.showhiddencontrol.base.entity.BaseFunctionModuleEntity;
@@ -22,4 +23,6 @@ public interface IBaseFunctionModuleService extends IService<BaseFunctionModuleE
     void shiftFunctionModule(TreeShiftDto treeShiftDto);
 
     void delFunctionModule(List<Long> ids);
+
+    void saveRelation(FunctionModuleSaveDto request);
 }

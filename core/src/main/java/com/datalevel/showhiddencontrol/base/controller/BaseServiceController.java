@@ -30,7 +30,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/base/service")
 @ApiSort(20)
-@Api(tags = "服务拆分")
+@Api(tags = "应用拆分")
 public class BaseServiceController {
     @Autowired
     IBaseServiceService iBaseServiceService;
