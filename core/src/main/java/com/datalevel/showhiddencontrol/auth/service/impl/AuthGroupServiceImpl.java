@@ -12,7 +12,6 @@ import com.datalevel.showhiddencontrol.auth.service.IAuthFunService;
 import com.datalevel.showhiddencontrol.auth.service.IAuthGroupService;
 import com.datalevel.showhiddencontrol.other.entity.UserAuthEntity;
 import com.datalevel.showhiddencontrol.other.service.IUserAuthService;
-import com.datalevel.showhiddencontrol.other.service.IUserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
