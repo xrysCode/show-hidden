@@ -17,7 +17,7 @@ import java.io.Serializable;
  * </p>
  *
  * @author xry
- * @since 2021-11-07
+ * @since 2021-11-08
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -31,17 +31,14 @@ public class UserInfoEntity implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty(value = "账号")
+    @ApiModelProperty(value = "昵称")
     private String nickname;
 
-    @ApiModelProperty(value = "密码")
+    @ApiModelProperty(value = "头像")
     private String headUrl;
 
     @ApiModelProperty(value = "性别")
     private String sex;
-
-    @ApiModelProperty(value = "名字")
-    private String userName;
 
 
 }
