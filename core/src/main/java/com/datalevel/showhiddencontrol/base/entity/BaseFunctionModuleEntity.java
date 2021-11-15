@@ -14,6 +14,7 @@ import lombok.experimental.Accessors;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Update;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -41,10 +42,10 @@ public class BaseFunctionModuleEntity implements Serializable {
     @NotNull(groups = Update.class)
     private Long id;
 
-    @NotNull(groups = {Insert.class,Update.class,})
-    private Long appId;
-    @NotNull(groups = {Insert.class,})
     private Long parentId;
+
+    @NotNull(groups = {Insert.class,Update.class,})
+    private Long serviceId;
 
     @ApiModelProperty(value = "功能名")
     @NotNull(groups = {Insert.class,Update.class,})
@@ -57,10 +58,6 @@ public class BaseFunctionModuleEntity implements Serializable {
     @NotNull(groups = {Insert.class,Update.class,})
     private String currentReferer;
 
-    @ApiModelProperty(value = "是否是前端功能模块，否则是后端接口功能")
-    @NotNull(groups = {Insert.class,Update.class,})
-    private Boolean isFrontEnd;
-
     @ApiModelProperty(value = "后端访问接口")
     private String requestUrl;
 
@@ -69,7 +66,7 @@ public class BaseFunctionModuleEntity implements Serializable {
 
     @ApiModelProperty(value = "页面组件类型json 必有{name,__file,props}")
     @JsonIgnore
-    private String compType;
+    private String comType;
 
     @ApiModelProperty(value = "props k-v 对；确定组件props的唯一值，组件是复用的，所以有相同的type，但是组件的props的值不同，这里只保存能够确定组件的关键值来组成K-v的数据，如果权限匹配到这些数据那么就进行管控，确定唯一的方式是referer+type+props的值，当有多个冲突的时候那么增加props的值对")
     @JsonIgnore
@@ -84,11 +81,11 @@ public class BaseFunctionModuleEntity implements Serializable {
 
     @ApiModelProperty(value = "组件type 属性json")
     public Map<String,Object> getComponentType() {
-        return JSONUtil.toBean(compType, HashMap.class);
+        return JSONUtil.toBean(comType, HashMap.class);
     }
     @ApiModelProperty(value = "组件type 属性json")
     public BaseFunctionModuleEntity setComponentType(Map<String,Object> componentType) {
-        this.compType = JSONUtil.toJsonStr(componentType);;
+        this.comType = JSONUtil.toJsonStr(componentType);;
         return this;
     }
 

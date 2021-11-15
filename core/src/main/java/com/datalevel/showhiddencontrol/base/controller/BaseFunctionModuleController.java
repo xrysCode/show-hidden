@@ -36,7 +36,7 @@ public class BaseFunctionModuleController {
 
     @GetMapping
     @ApiOperation(value = "获取服务的功能树")
-    public ResponseResult<List<FunctionModuleTreeDto>> getTreeByAppId(Long appId){
+    public ResponseResult<List<FunctionModuleTreeDto>> getTreeByAppId(@RequestParam Long appId){
         return new ResponseResult<>(iBaseFunctionModuleService.queryByAppId(appId));
     }
     @PostMapping

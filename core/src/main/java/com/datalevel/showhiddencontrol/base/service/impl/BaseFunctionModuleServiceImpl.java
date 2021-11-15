@@ -12,10 +12,13 @@ import com.datalevel.showhiddencontrol.base.dto.FunctionModuleTreeDto;
 import com.datalevel.showhiddencontrol.base.dto.TreeShiftDto;
 import com.datalevel.showhiddencontrol.base.entity.BaseFunFieldEntity;
 import com.datalevel.showhiddencontrol.base.entity.BaseFunctionModuleEntity;
+import com.datalevel.showhiddencontrol.base.entity.BaseServiceEntity;
 import com.datalevel.showhiddencontrol.base.mapper.BaseFunFieldMapper;
 import com.datalevel.showhiddencontrol.base.mapper.BaseFunctionModuleMapper;
+import com.datalevel.showhiddencontrol.base.service.IBaseApplicationService;
 import com.datalevel.showhiddencontrol.base.service.IBaseFunFieldService;
 import com.datalevel.showhiddencontrol.base.service.IBaseFunctionModuleService;
+import com.datalevel.showhiddencontrol.base.service.IBaseServiceService;
 import com.datalevel.showhiddencontrol.config.BusinessException;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,18 +48,31 @@ public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModul
     IBaseFunFieldService iBaseFunFieldService;
     @Autowired
     AuthFieldMapper authFieldMapper;
-
+    @Autowired
+    IBaseApplicationService iBaseApplicationService;
+    @Autowired
+    IBaseServiceService iBaseServiceService;
 
     @Override
     public List<FunctionModuleTreeDto> queryByAppId(Long appId) {
-        return fullTree( appId, 0L);
+        return fullTree( appId, null);
     }
 
     private List<FunctionModuleTreeDto> fullTree(Long appId,Long parentId){
+        LambdaQueryWrapper<BaseServiceEntity> queryServiceWrapper = new QueryWrapper<BaseServiceEntity>().lambda()
+                .eq(BaseServiceEntity::getAppId, appId);
+        List<Long> serviceIds = iBaseServiceService.getBaseMapper().selectList(queryServiceWrapper).stream()
+                .map(BaseServiceEntity::getId).collect(Collectors.toList());
+
         LambdaQueryWrapper<BaseFunctionModuleEntity> queryWrapper = new QueryWrapper<BaseFunctionModuleEntity>().lambda()
-                .eq(BaseFunctionModuleEntity::getAppId,appId)
-                .eq(BaseFunctionModuleEntity::getParentId, parentId)
+                .in(BaseFunctionModuleEntity::getServiceId,serviceIds)
                 .orderByAsc(BaseFunctionModuleEntity::getSort);
+        if(parentId==null){
+            queryWrapper.isNull(BaseFunctionModuleEntity::getParentId);
+        }else {
+            queryWrapper.eq(BaseFunctionModuleEntity::getParentId, parentId);
+        }
+
         List<FunctionModuleTreeDto> treeEntities = baseMapper.selectList(queryWrapper).stream()
                 .map(functionModuleEntity -> {
                     FunctionModuleTreeDto treeDto = BeanUtil.copyProperties(functionModuleEntity, FunctionModuleTreeDto.class);
@@ -139,6 +155,10 @@ public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModul
     @Override
     @Transactional
     public void saveRelation(FunctionModuleSaveDto functionModuleSaveDto) {
+        BaseServiceEntity baseServiceEntity = iBaseServiceService.getBaseMapper().selectById(functionModuleSaveDto.getServiceId());
+        if(baseServiceEntity==null){
+            throw new BusinessException("不存在的服务");
+        }
         if(functionModuleSaveDto.getId()==null){
             save(functionModuleSaveDto);
         }else{
