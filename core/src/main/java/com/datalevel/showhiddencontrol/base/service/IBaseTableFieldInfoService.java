@@ -17,4 +17,6 @@ import java.util.List;
 public interface IBaseTableFieldInfoService extends IService<BaseTableFieldInfoEntity> {
 
     List<TableFieldInfoDto> getTableFieldInfo(Long serviceId, Long parentId);
+
+    Boolean modifyTableFieldInfo(BaseTableFieldInfoEntity tableFieldInfoEntity);
 }

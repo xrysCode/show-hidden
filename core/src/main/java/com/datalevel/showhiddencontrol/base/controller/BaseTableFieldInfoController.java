@@ -14,10 +14,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiSort;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,7 +28,7 @@ import java.util.List;
  * @since 2021-10-30
  */
 @RestController
-@RequestMapping("/base/table-field-info")
+@RequestMapping("/base/table-field")
 @ApiSort(20)
 @Api(tags = "表级所有字段")
 public class BaseTableFieldInfoController {
@@ -41,5 +39,11 @@ public class BaseTableFieldInfoController {
     @ApiOperation(value = "获取表级字段",notes = "parentId null表示是表，其他代表字段,")
     public ResponseResult<List<TableFieldInfoDto>> getTableFieldInfo(@RequestParam @ApiParam("服务id") Long serviceId, Long parentId){
         return new ResponseResult<>(iBaseTableFieldInfoService.getTableFieldInfo(  serviceId, parentId));
+    }
+
+    @PutMapping
+    @ApiOperation(value = "获取表级字段",notes = "parentId null表示是表，其他代表字段,")
+    public ResponseResult<Boolean> modifyTableFieldInfo(@RequestBody @Validated BaseTableFieldInfoEntity tableFieldInfoEntity){
+        return new ResponseResult<>(iBaseTableFieldInfoService.modifyTableFieldInfo(tableFieldInfoEntity));
     }
 }

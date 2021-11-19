@@ -58,4 +58,11 @@ public class BaseTableFieldInfoServiceImpl extends ServiceImpl<BaseTableFieldInf
         ).collect(Collectors.toList());
     }
 
+    @Override
+    public Boolean modifyTableFieldInfo(BaseTableFieldInfoEntity tableFieldInfoEntity) {
+        tableFieldInfoEntity.setParentId(null)
+                .setServiceId(null);
+        return updateById(tableFieldInfoEntity);
+    }
+
 }
