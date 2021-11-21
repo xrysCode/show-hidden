@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 @Configuration
 @MapperScan({"com.datalevel.showhiddencontrol.auth.mapper","com.datalevel.showhiddencontrol.base.mapper","com.datalevel.showhiddencontrol.other.mapper"})

@@ -42,7 +42,7 @@ public class BaseTableFieldInfoController {
     }
 
     @PutMapping
-    @ApiOperation(value = "获取表级字段",notes = "parentId null表示是表，其他代表字段,")
+    @ApiOperation(value = "修改表级字段",notes = "parentId null表示是表，其他代表字段,")
     public ResponseResult<Boolean> modifyTableFieldInfo(@RequestBody @Validated BaseTableFieldInfoEntity tableFieldInfoEntity){
         return new ResponseResult<>(iBaseTableFieldInfoService.modifyTableFieldInfo(tableFieldInfoEntity));
     }

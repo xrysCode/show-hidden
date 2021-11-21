@@ -2,8 +2,10 @@ package com.datalevel.showhiddencontrol.other.entity;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,6 +19,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,7 +33,7 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("other_menus")
+@TableName(value = "other_menus",autoResultMap=true)
 @ApiModel(value="OtherMenusEntity对象", description="")
 public class OtherMenusEntity implements Serializable {
 
@@ -66,7 +69,8 @@ public class OtherMenusEntity implements Serializable {
     private Integer sort;
 
     @ApiModelProperty(value = "权限keys")
-    private String authKeys;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> authKeys;
 
     private LocalDateTime createTime;
 

@@ -2,6 +2,7 @@ package com.datalevel.showhiddencontrol.sdk;
 
 import com.datalevel.showhiddencontrol.communicate.TableSync;
 import com.datalevel.showhiddencontrol.communicate.dto.TableScanDto;
+import com.datalevel.showhiddencontrol.sdk.intercept.SqlAuthIntercept;
 import com.datalevel.showhiddencontrol.sdk.table.TableFieldScan;
 import com.datalevel.showhiddencontrol.sdk.table.TableInfoDto;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,9 @@ public class TableAutoConfig {
     public TableFieldScan localTableFieldScan(DataSource dataSource){
         TableFieldScan tableFieldScan = new TableFieldScan(dataSource);
         List<TableInfoDto> tableInfo = tableFieldScan.getLocalTableInfo();
+        SqlAuthIntercept.setNeedAuth(false);
         tableSync.syncTableInfo(new TableScanDto(authCode,tableInfo));
+        SqlAuthIntercept.removeNeedAuth();
         log.info("本地表解析完毕");
         return tableFieldScan;
     }

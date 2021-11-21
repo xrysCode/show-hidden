@@ -61,7 +61,9 @@ public class BaseTableFieldInfoServiceImpl extends ServiceImpl<BaseTableFieldInf
     @Override
     public Boolean modifyTableFieldInfo(BaseTableFieldInfoEntity tableFieldInfoEntity) {
         tableFieldInfoEntity.setParentId(null)
-                .setServiceId(null);
+                .setServiceId(null)
+                .setDbTableField(null)
+                .setPropertyName(null);
         return updateById(tableFieldInfoEntity);
     }
 
