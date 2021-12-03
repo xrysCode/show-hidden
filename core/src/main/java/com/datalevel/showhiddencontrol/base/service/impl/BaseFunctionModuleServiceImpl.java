@@ -4,6 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.datalevel.showhiddencontrol.auth.mapper.AuthFieldMapper;
 import com.datalevel.showhiddencontrol.auth.mapper.AuthFunMapper;
@@ -26,10 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -63,6 +62,9 @@ public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModul
                 .eq(BaseServiceEntity::getAppId, appId);
         List<Long> serviceIds = iBaseServiceService.getBaseMapper().selectList(queryServiceWrapper).stream()
                 .map(BaseServiceEntity::getId).collect(Collectors.toList());
+        if(serviceIds.size()==0){
+            return Lists.newArrayList();
+        }
 
         LambdaQueryWrapper<BaseFunctionModuleEntity> queryWrapper = new QueryWrapper<BaseFunctionModuleEntity>().lambda()
                 .in(BaseFunctionModuleEntity::getServiceId,serviceIds)
@@ -102,7 +104,8 @@ public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModul
             replaceEntityList = baseMapper.selectList(queryWrapper);
             draggingEntity.setParentId(replaceEntity.getId()).setSort(0).setCreateTime(null).setCreateUser(null);
         }else {
-            queryWrapper.eq(BaseFunctionModuleEntity::getParentId, replaceEntity.getParentId());
+            queryWrapper=replaceEntity.getParentId()==null?queryWrapper.isNull(BaseFunctionModuleEntity::getParentId)
+                    :queryWrapper.eq(BaseFunctionModuleEntity::getParentId, replaceEntity.getParentId());
             replaceEntityList = baseMapper.selectList(queryWrapper);
             draggingEntity.setParentId(replaceEntity.getParentId()).setCreateTime(null).setCreateUser(null);
         }
@@ -135,7 +138,17 @@ public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModul
                 updateData.add(moduleEntity);// 全量更新因为可能不连续
             }
         }
-        updateBatchById(replaceEntityList);
+        if(draggingEntity.getParentId()==null){
+            LambdaUpdateWrapper<BaseFunctionModuleEntity> updateWrapper = new UpdateWrapper<BaseFunctionModuleEntity>().lambda();
+            updateData.forEach(functionModuleEntity -> {
+                updateWrapper.set(BaseFunctionModuleEntity::getParentId,null)
+                        .eq(BaseFunctionModuleEntity::getId,functionModuleEntity.getId());
+                update(functionModuleEntity,updateWrapper);
+                updateWrapper.clear();
+            });
+        }else {
+            updateBatchById(updateData);
+        }
 
     }
 

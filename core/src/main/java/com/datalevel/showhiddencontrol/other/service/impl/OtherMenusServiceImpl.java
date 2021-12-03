@@ -3,8 +3,11 @@ package com.datalevel.showhiddencontrol.other.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.datalevel.showhiddencontrol.base.dto.TreeShiftDto;
+import com.datalevel.showhiddencontrol.base.entity.BaseFunctionModuleEntity;
 import com.datalevel.showhiddencontrol.config.BusinessException;
 import com.datalevel.showhiddencontrol.other.dto.MenusTreeDto;
 import com.datalevel.showhiddencontrol.other.entity.OtherMenusEntity;
@@ -66,7 +69,8 @@ public class OtherMenusServiceImpl extends ServiceImpl<OtherMenusMapper, OtherMe
             replaceEntityList = baseMapper.selectList(queryWrapper);
             draggingEntity.setParentId(replaceEntity.getId()).setSort(0).setCreateTime(null).setCreateUser(null);
         }else {
-            queryWrapper.eq(OtherMenusEntity::getParentId, replaceEntity.getParentId());
+            queryWrapper=replaceEntity.getParentId()==null?queryWrapper.isNull(OtherMenusEntity::getParentId)
+                    :queryWrapper.eq(OtherMenusEntity::getParentId, replaceEntity.getParentId());
             replaceEntityList = baseMapper.selectList(queryWrapper);
             draggingEntity.setParentId(replaceEntity.getParentId()).setCreateTime(null).setCreateUser(null);
         }
@@ -99,6 +103,16 @@ public class OtherMenusServiceImpl extends ServiceImpl<OtherMenusMapper, OtherMe
                 updateData.add(moduleEntity);// 全量更新因为可能不连续
             }
         }
-        updateBatchById(updateData);
+        if(draggingEntity.getParentId()==null){
+            LambdaUpdateWrapper<OtherMenusEntity> updateWrapper = new UpdateWrapper<OtherMenusEntity>().lambda();
+            updateData.forEach(functionModuleEntity -> {
+                updateWrapper.set(OtherMenusEntity::getParentId,null)
+                        .eq(OtherMenusEntity::getId,functionModuleEntity.getId());
+                update(functionModuleEntity,updateWrapper);
+                updateWrapper.clear();
+            });
+        }else {
+            updateBatchById(updateData);
+        }
     }
 }

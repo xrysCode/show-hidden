@@ -43,6 +43,13 @@ public class BaseApplicationEntity implements Serializable {
     @ApiModelProperty(value = "服务简述")
     private String appDesc;
 
+    @ApiModelProperty(value = "页面访问路径,")
+    @NotNull(groups = {Update.class, Insert.class})
+    private String accessPath;
+
+    @ApiModelProperty(value = "数据级的权限，拥有该权限关键字可以查看。空串表示所有人都可以访问。")
+    private String authKeys;
+
     private LocalDateTime createTime;
 
     @ApiModelProperty(value = "创建者")
