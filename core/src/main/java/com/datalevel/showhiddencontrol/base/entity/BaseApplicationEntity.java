@@ -1,8 +1,10 @@
 package com.datalevel.showhiddencontrol.base.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,6 +16,7 @@ import org.apache.ibatis.annotations.Update;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -26,7 +29,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("base_application")
+@TableName(value="base_application",autoResultMap=true)
 @ApiModel(value="BaseApplicationEntity对象", description="应用表")
 public class BaseApplicationEntity implements Serializable {
 
@@ -47,8 +50,13 @@ public class BaseApplicationEntity implements Serializable {
     @NotNull(groups = {Update.class, Insert.class})
     private String accessPath;
 
-    @ApiModelProperty(value = "数据级的权限，拥有该权限关键字可以查看。空串表示所有人都可以访问。")
-    private String authKeys;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    @ApiModelProperty(value = "权限appKeys")
+    private List<String> authAppKeys;
+
+    @ApiModelProperty(value = "权限serviceKeys")
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> authServiceKeys;
 
     private LocalDateTime createTime;
 

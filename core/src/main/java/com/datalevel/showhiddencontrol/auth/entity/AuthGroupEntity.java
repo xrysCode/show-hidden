@@ -1,14 +1,21 @@
 package com.datalevel.showhiddencontrol.auth.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler;
+import com.datalevel.showhiddencontrol.auth.AppServiceEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Update;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -32,20 +39,24 @@ public class AuthGroupEntity implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty(value = "有值代表这个范围")
-    private Long appId;
-
-    @ApiModelProperty(value = "有值代表这个范围(推荐，因为用户不会按照也不关心后端的微服务拆分)")
-    private Long serviceId;
-
     @ApiModelProperty(value = "权限组名")
+    @NotBlank(groups = {Update.class, Insert.class})
     private String authName;
+
+    @ApiModelProperty(value = "code编码，数据级使用，目的降低字符长度")
+    private Integer authCode;
 
     @ApiModelProperty(value = "组描述")
     private String authDesc;
 
-    @ApiModelProperty(value = "code编码，数据级使用，目的降低字符长度")
-    private Integer authCode;
+    @ApiModelProperty(value = "app service 类型，枚举(app，service)")
+    @TableField(typeHandler = MybatisEnumTypeHandler.class)
+    @NotNull(groups = {Update.class, Insert.class})
+    private AppServiceEnum appServiceType;
+
+    @ApiModelProperty(value = "app service id 不同维度条件不同")
+    @NotNull(groups = {Update.class, Insert.class})
+    private Long appServiceId;
 
     private LocalDateTime createTime;
 

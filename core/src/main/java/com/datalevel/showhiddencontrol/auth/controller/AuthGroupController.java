@@ -5,6 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.datalevel.showhiddencontrol.auth.dto.AuthGroupDto;
 import com.datalevel.showhiddencontrol.auth.entity.AuthGroupEntity;
 import com.datalevel.showhiddencontrol.auth.service.IAuthGroupService;
 import com.datalevel.showhiddencontrol.base.entity.BaseApplicationEntity;
@@ -40,22 +41,25 @@ public class AuthGroupController {
 
     @GetMapping
     @ApiOperation(value = "查询分组")
-    public ResponseResult<ResponsePage<AuthGroupEntity>> getByPage(RequestPage requestPage){
-        Page<AuthGroupEntity> page = Page.of(requestPage.getCurrent(), requestPage.getSize());
-        LambdaQueryWrapper<AuthGroupEntity> queryWrapper = new QueryWrapper<AuthGroupEntity>()
-                .lambda().orderByDesc(AuthGroupEntity::getCreateTime);
-        iAuthGroupService.page(page, queryWrapper);
-        return new ResponseResult<>(BeanUtil.copyProperties(page,ResponsePage.class));
+    public ResponseResult<ResponsePage<AuthGroupDto>> getByPage(RequestPage requestPage){
+        return new ResponseResult<>(iAuthGroupService.getByPage(requestPage));
     }
     @PostMapping
     @ApiOperation(value = "添加权限")
     public ResponseResult<Boolean> addApp(@RequestBody @Validated(Insert.class) AuthGroupEntity request){
+        LambdaQueryWrapper<AuthGroupEntity> queryWrapper = new QueryWrapper<AuthGroupEntity>().lambda()
+                .eq(AuthGroupEntity::getAppServiceType,request.getAppServiceType())
+                .eq(AuthGroupEntity::getAppServiceId, request.getAppServiceId());
+        List<AuthGroupEntity> list = iAuthGroupService.list(queryWrapper);
+        request.setAuthCode(list.size()+1);
         iAuthGroupService.save(request);
         return new ResponseResult<>(true);
     }
     @PutMapping
-    @ApiOperation(value = "修改权限")
+    @ApiOperation(value = "修改权限",notes = "不允许修改归属服务")
     public ResponseResult<Boolean> updateApp(@RequestBody @Validated(Update.class) AuthGroupEntity request){
+        request.setAppServiceType(null)
+                .setAppServiceId(null);
         iAuthGroupService.updateById(request);
         return new ResponseResult<>(true);
     }

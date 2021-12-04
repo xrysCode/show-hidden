@@ -1,8 +1,12 @@
 package com.datalevel.showhiddencontrol.auth.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.datalevel.showhiddencontrol.auth.AppServiceEnum;
+import com.datalevel.showhiddencontrol.auth.dto.AuthGroupDto;
 import com.datalevel.showhiddencontrol.auth.entity.AuthFieldEntity;
 import com.datalevel.showhiddencontrol.auth.entity.AuthFunEntity;
 import com.datalevel.showhiddencontrol.auth.entity.AuthGroupEntity;
@@ -10,6 +14,12 @@ import com.datalevel.showhiddencontrol.auth.mapper.AuthGroupMapper;
 import com.datalevel.showhiddencontrol.auth.service.IAuthFieldService;
 import com.datalevel.showhiddencontrol.auth.service.IAuthFunService;
 import com.datalevel.showhiddencontrol.auth.service.IAuthGroupService;
+import com.datalevel.showhiddencontrol.base.entity.BaseApplicationEntity;
+import com.datalevel.showhiddencontrol.base.entity.BaseServiceEntity;
+import com.datalevel.showhiddencontrol.base.service.IBaseApplicationService;
+import com.datalevel.showhiddencontrol.base.service.IBaseServiceService;
+import com.datalevel.showhiddencontrol.common.RequestPage;
+import com.datalevel.showhiddencontrol.common.ResponsePage;
 import com.datalevel.showhiddencontrol.other.entity.UserAuthEntity;
 import com.datalevel.showhiddencontrol.other.service.IUserAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -34,6 +45,33 @@ public class AuthGroupServiceImpl extends ServiceImpl<AuthGroupMapper, AuthGroup
     IAuthFieldService iAuthFieldService;
     @Autowired
     IUserAuthService iUserAuthService;
+    @Autowired
+    IBaseApplicationService iBaseApplicationService;
+    @Autowired
+    IBaseServiceService iBaseServiceService;
+
+    @Override
+    public ResponsePage<AuthGroupDto> getByPage(RequestPage requestPage) {
+        Page<AuthGroupEntity> page = Page.of(requestPage.getCurrent(), requestPage.getSize());
+        LambdaQueryWrapper<AuthGroupEntity> queryWrapper = new QueryWrapper<AuthGroupEntity>()
+                .lambda().orderByDesc(AuthGroupEntity::getCreateTime);
+        page(page, queryWrapper);
+        List<AuthGroupDto> authGroupDtoList = page.getRecords().stream().map(authGroupEntity -> {
+            AuthGroupDto authGroupDto = BeanUtil.copyProperties(authGroupEntity, AuthGroupDto.class);
+            if (authGroupEntity.getAppServiceType() == AppServiceEnum.APP) {
+                BaseApplicationEntity applicationEntity = iBaseApplicationService.getById(authGroupEntity.getId());
+                authGroupDto.setAppServiceName(applicationEntity.getAppName());
+            } else {
+                BaseServiceEntity serviceEntity = iBaseServiceService.getById(authGroupEntity.getAppServiceId());
+                authGroupDto.setAppServiceName(serviceEntity.getServiceName());
+            }
+            return authGroupDto;
+        }).collect(Collectors.toList());
+
+        ResponsePage responsePage = BeanUtil.copyProperties(requestPage, ResponsePage.class);
+        return responsePage.setTotal(page.getTotal())
+                .setRecords(authGroupDtoList);
+    }
 
     @Override
     @Transactional
@@ -52,4 +90,6 @@ public class AuthGroupServiceImpl extends ServiceImpl<AuthGroupMapper, AuthGroup
 
         removeByIds(ids);
     }
+
+
 }

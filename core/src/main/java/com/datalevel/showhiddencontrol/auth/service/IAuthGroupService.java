@@ -1,7 +1,10 @@
 package com.datalevel.showhiddencontrol.auth.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.datalevel.showhiddencontrol.auth.dto.AuthGroupDto;
 import com.datalevel.showhiddencontrol.auth.entity.AuthGroupEntity;
+import com.datalevel.showhiddencontrol.common.RequestPage;
+import com.datalevel.showhiddencontrol.common.ResponsePage;
 
 import java.util.List;
 
@@ -16,4 +19,6 @@ import java.util.List;
 public interface IAuthGroupService extends IService<AuthGroupEntity> {
 
     void delApp(List<Long> ids);
+
+    ResponsePage<AuthGroupDto> getByPage(RequestPage requestPage);
 }

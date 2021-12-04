@@ -1,6 +1,9 @@
 package com.datalevel.showhiddencontrol.other.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.datalevel.showhiddencontrol.common.RequestPage;
+import com.datalevel.showhiddencontrol.common.ResponsePage;
+import com.datalevel.showhiddencontrol.other.dto.UserAuthDto;
 import com.datalevel.showhiddencontrol.other.entity.UserAuthEntity;
 
 /**
@@ -13,4 +16,5 @@ import com.datalevel.showhiddencontrol.other.entity.UserAuthEntity;
  */
 public interface IUserAuthService extends IService<UserAuthEntity> {
 
+    ResponsePage<UserAuthDto> getByPage(RequestPage requestPage, UserAuthEntity userAuthEntity);
 }

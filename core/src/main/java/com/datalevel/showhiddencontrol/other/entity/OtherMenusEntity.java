@@ -1,12 +1,10 @@
 package com.datalevel.showhiddencontrol.other.entity;
 
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -18,9 +16,7 @@ import org.apache.ibatis.annotations.Update;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -57,34 +53,21 @@ public class OtherMenusEntity implements Serializable {
     @ApiModelProperty(value = "路由路径")
     private String routerPath;
 
-    @ApiModelProperty(value = "组件props 属性json")
-    @JsonIgnore
-    private String comProps;
-
-    @ApiModelProperty(value = "组件位置路径")
-    private String comImport;
-
     @ApiModelProperty(value = "菜单排序")
     @NotNull(groups = {Insert.class})
     private Integer sort;
 
-    @ApiModelProperty(value = "权限keys")
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<String> authKeys;
+    @ApiModelProperty(value = "权限appKeys")
+    private List<String> authAppKeys;
+
+    @ApiModelProperty(value = "权限serviceKeys")
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> authServiceKeys;
 
     private LocalDateTime createTime;
 
     private String createUser;
 
-
-    @ApiModelProperty(value = "组件props 属性json")
-    public Map<String,Object> getComponentProps() {
-        return JSONUtil.toBean(comProps, HashMap.class);
-    }
-    @ApiModelProperty(value = "组件props 属性json")
-    public OtherMenusEntity setComponentProps(Map<String,Object> componentProps) {
-        this.comProps = JSONUtil.toJsonStr(componentProps);;
-        return this;
-    }
 
 }

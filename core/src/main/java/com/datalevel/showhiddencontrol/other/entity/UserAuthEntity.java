@@ -7,6 +7,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Update;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>
@@ -24,11 +28,11 @@ import lombok.experimental.Accessors;
 public class UserAuthEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    @NotNull(groups = {Update.class})
     private Long id;
-
+    @NotNull(groups = {Insert.class, Update.class})
     private Long userId;
-
+    @NotNull(groups = {Insert.class, Update.class})
     private Long authId;
 
 

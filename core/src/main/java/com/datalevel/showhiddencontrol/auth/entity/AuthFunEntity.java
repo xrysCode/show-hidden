@@ -7,7 +7,10 @@ import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Update;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -29,10 +32,11 @@ public class AuthFunEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
+    @NotBlank(groups = {Update.class})
     private Long id;
-
+    @NotBlank(groups = {Update.class, Insert.class})
     private Long funId;
-
+    @NotBlank(groups = {Update.class, Insert.class})
     private Long authId;
 
     private LocalDateTime createTime;
