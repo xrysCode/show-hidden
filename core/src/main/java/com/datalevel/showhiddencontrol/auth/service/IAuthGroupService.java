@@ -21,4 +21,6 @@ public interface IAuthGroupService extends IService<AuthGroupEntity> {
     void delApp(List<Long> ids);
 
     ResponsePage<AuthGroupDto> getByPage(RequestPage requestPage);
+
+    List<AuthGroupEntity> selectByUserAndAppServices(Long userId, Long appId, List<Long> serviceIds);
 }

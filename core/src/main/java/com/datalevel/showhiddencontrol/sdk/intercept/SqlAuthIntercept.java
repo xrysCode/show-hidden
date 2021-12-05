@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.RegExpMatchOperatorType;
 import net.sf.jsqlparser.expression.operators.relational.RegExpMySQLOperator;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -62,21 +64,20 @@ public class SqlAuthIntercept implements Interceptor {
         }
         Object target = invocation.getTarget();
         BoundSql boundSql = ((StatementHandler) target).getBoundSql();
-        Map<String, TableFieldValue> tableFieldValueMap = UserAuth.getUserAuthInfo();
         String sql = boundSql.getSql().trim();
         String startSqlCommandType = sql.substring(0, sql.indexOf(" ")).toUpperCase();
         switch (startSqlCommandType){
             case "SELECT":
-                sql = getAuthSelect(sql, tableFieldValueMap);
+                sql = getAuthSelect(sql);
             break;
             case "INSERT":
-                sql = getAuthInsert(sql, tableFieldValueMap);
+                sql = getAuthInsert(sql);
                 break;
             case "UPDATE":
-                sql = getAuthUpdate(sql, tableFieldValueMap);
+                sql = getAuthUpdate(sql);
                 break;
             case "DELETE":
-                sql = getAuthDelete(sql, tableFieldValueMap);
+                sql = getAuthDelete(sql);
                 break;
         }
         Field sqlField = BoundSql.class.getDeclaredField("sql");
@@ -87,41 +88,63 @@ public class SqlAuthIntercept implements Interceptor {
 
 
 
-    public String getAuthSelect(String sql, Map<String, TableFieldValue> tableAuthMap) throws JSQLParserException {
+    public String getAuthSelect(String sql ) throws JSQLParserException {
         Select select = (Select) CCJSqlParserUtil.parse(sql);
         PlainSelect selectBody = (PlainSelect)select.getSelectBody();
         // 过滤查询的字段
         List<SelectItem> selectItems = selectBody.getSelectItems();
 
         Table fromTable = (Table)selectBody.getFromItem();
-        getFullExpression(tableAuthMap,fromTable, ()->new MultiAndExpression(Lists.newArrayList(selectBody.getWhere())),(e)->selectBody.setWhere(e));
+        getFullExpression(fromTable, ()->new MultiAndExpression(Lists.newArrayList(selectBody.getWhere())),(e)->selectBody.setWhere(e));
 
         List<Join> joins = selectBody.getJoins();
         if(joins!=null){
             for (Join join:joins) {
                 Table table = (Table)join.getRightItem();
-                getFullExpression(tableAuthMap,table, ()->new MultiAndExpression(join.getOnExpressions().stream().collect(Collectors.toList())), (e)->join.setOnExpressions(Lists.newArrayList(e)));
+                getFullExpression(table, ()->new MultiAndExpression(join.getOnExpressions().stream().collect(Collectors.toList())), (e)->join.setOnExpressions(Lists.newArrayList(e)));
             }
         }
         return select.toString();
     }
 
-    public <T> void getFullExpression(Map<String, TableFieldValue> tableAuthMap, Table table,
-                                             Supplier<MultiAndExpression> conversion, Consumer<AndExpression> setExpression) {
-        TableFieldValue tableFieldValue = tableAuthMap.get(table.getName());
-        if(tableFieldValue==null){
+    public <T> void getFullExpression(Table table, Supplier<MultiAndExpression> conversion, Consumer<AndExpression> setExpression) {
+        Map<String, String> userAuthInfo = UserAuth.getUserAuthInfo(table.getName());
+        if(userAuthInfo==null||userAuthInfo.size()==0){
             return ;
         }
+        LinkedList<RegExpMySQLOperator> regExpMySQLOperators = new LinkedList<>();
+        userAuthInfo.forEach((field,value)->{
+            Column column = new Column(table, field);
+            if(value==null){//为空的时候 不能查看任何数据
+//                new AndExpression(column,)
+            }else {
+                RegExpMySQLOperator regExpMatchOperator = new RegExpMySQLOperator(RegExpMatchOperatorType.MATCH_CASEINSENSITIVE);
+                regExpMatchOperator.setLeftExpression(column);
+                regExpMatchOperator.setRightExpression(new StringValue(value));
+                regExpMySQLOperators.add(regExpMatchOperator);
+            }
+
+        });
+        OrExpression orExpression=null;
+        for (int i = 1; i < regExpMySQLOperators.size(); i++) {
+            if(i==1){
+                orExpression= new OrExpression(regExpMySQLOperators.get(0),regExpMySQLOperators.get(1));
+            }else {
+                orExpression= new OrExpression(orExpression,regExpMySQLOperators.get(i));
+            }
+        }
         MultiAndExpression multiAndExpression = conversion.get();// new MultiAndExpression((Lists.newArrayList(expression)));//多租户拼接
-        Column column = new Column(table, tableFieldValue.getDbTableField());
-        RegExpMySQLOperator regExpMatchOperator = new RegExpMySQLOperator(RegExpMatchOperatorType.MATCH_CASEINSENSITIVE);
-        regExpMatchOperator.setLeftExpression(column);
-        regExpMatchOperator.setRightExpression(new StringValue(tableFieldValue.getValue()));
-        AndExpression andExpression = new AndExpression(multiAndExpression, regExpMatchOperator);
-        setExpression.accept(andExpression);
+        if(orExpression==null){
+            AndExpression andExpression = new AndExpression(multiAndExpression, regExpMySQLOperators.get(0));
+            setExpression.accept(andExpression);
+        }else {
+            AndExpression andExpression = new AndExpression(multiAndExpression, orExpression);
+            setExpression.accept(andExpression);
+        }
+
     }
 
-    public String getAuthInsert(String sql, Map<String, TableFieldValue> tableAuthMap) throws JSQLParserException {
+    public String getAuthInsert(String sql ) throws JSQLParserException {
 //        Insert insert = (Insert)CCJSqlParserUtil.parse(sql);
         // 插入不需要验证
         return sql;
@@ -130,29 +153,20 @@ public class SqlAuthIntercept implements Interceptor {
     /**
      * 更新的时候验证是否具有当前数据的权限
      * @param sql
-     * @param tableAuthMap
      * @return
      * @throws JSQLParserException
      */
-    public String getAuthUpdate(String sql, Map<String, TableFieldValue> tableAuthMap) throws JSQLParserException {
+    public String getAuthUpdate(String sql ) throws JSQLParserException {
         Update insert = (Update)CCJSqlParserUtil.parse(sql);
         Table table = insert.getTable();
-        TableFieldValue tableFieldValue = tableAuthMap.get(table.getName());
-        if(tableFieldValue==null){
-            return sql;
-        }
-        getFullExpression(tableAuthMap, table,()->new MultiAndExpression(Lists.newArrayList(insert.getWhere())),(e)->insert.setWhere(e));
+        getFullExpression(table,()->new MultiAndExpression(Lists.newArrayList(insert.getWhere())),(e)->insert.setWhere(e));
         return insert.toString();
     }
 
-    public String getAuthDelete(String sql, Map<String, TableFieldValue> tableAuthMap) throws JSQLParserException {
+    public String getAuthDelete(String sql ) throws JSQLParserException {
         Delete delete = (Delete)CCJSqlParserUtil.parse(sql);
         Table table = delete.getTable();
-        TableFieldValue tableFieldValue = tableAuthMap.get(table.getName());
-        if(tableFieldValue==null){
-            return sql;
-        }
-        getFullExpression(tableAuthMap, table,()->new MultiAndExpression(Lists.newArrayList(delete.getWhere())),(e)->delete.setWhere(e));
+        getFullExpression(table,()->new MultiAndExpression(Lists.newArrayList(delete.getWhere())),(e)->delete.setWhere(e));
         return delete.toString();
     }
 }

@@ -4,12 +4,14 @@ package com.datalevel.showhiddencontrol.other.controller;
 import com.datalevel.showhiddencontrol.auth.dto.AuthFunDto;
 import com.datalevel.showhiddencontrol.auth.entity.AuthFunEntity;
 import com.datalevel.showhiddencontrol.auth.service.IAuthFunService;
+import com.datalevel.showhiddencontrol.base.entity.BaseFunctionModuleEntity;
 import com.datalevel.showhiddencontrol.common.RequestPage;
 import com.datalevel.showhiddencontrol.common.ResponsePage;
 import com.datalevel.showhiddencontrol.common.ResponseResult;
 import com.datalevel.showhiddencontrol.other.dto.UserAuthDto;
 import com.datalevel.showhiddencontrol.other.entity.UserAuthEntity;
 import com.datalevel.showhiddencontrol.other.service.IUserAuthService;
+import com.datalevel.showhiddencontrol.sdk.auth.UserAuth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Insert;
@@ -60,4 +62,11 @@ public class UserAuthController {
         return new ResponseResult<>(true);
     }
 
+
+    @GetMapping("getByAppId")
+    @ApiOperation(value = "查询用户权限功能")
+    public ResponseResult<List<BaseFunctionModuleEntity>> getByAppId(@RequestParam Long appId){
+        Long userId = UserAuth.getUserId();
+        return new ResponseResult<>(iUserAuthService.getUserFrontendAuth(appId,userId));
+    }
 }

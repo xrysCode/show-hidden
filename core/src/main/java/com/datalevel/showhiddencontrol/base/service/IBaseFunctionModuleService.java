@@ -25,4 +25,6 @@ public interface IBaseFunctionModuleService extends IService<BaseFunctionModuleE
     void delFunctionModule(List<Long> ids);
 
     void saveRelation(FunctionModuleSaveDto request);
+
+    List<BaseFunctionModuleEntity> selectByAuthId(List<Long> authIds);
 }

@@ -2,4 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.datalevel.showhiddencontrol.auth.mapper.AuthGroupMapper">
 
+    <select id="selectByUserAndAppServices" resultType="com.datalevel.showhiddencontrol.auth.entity.AuthGroupEntity">
+        SELECT
+            a.*
+        FROM
+            auth_group a
+            INNER JOIN user_auth u ON a.id = u.auth_id
+            AND u.auth_id = #{userId}
+        WHERE
+        <if test="appId!=null">
+            (a.app_service_type = 'APP' AND a.app_service_id = #{appId})
+        </if>
+
+        <if test="serviceIds!=null serviceIds.size!=0">
+            or (a.app_service_type = 'SERVICE' and a.app_service_id in
+            <foreach collection="serviceIds" item="serviceId" open="(" close=")" separator=",">
+                #{serviceId}
+            </foreach>
+            )
+        </if>
+
+    </select>
 </mapper>

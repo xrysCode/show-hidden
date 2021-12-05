@@ -38,12 +38,12 @@ public class SwaggerConfig {
      */
     @Bean(name = "base")
     public Docket createRestApiBase(){
-        return createRestApi("基础元数据","com.datalevel.showhiddencontrol.base.controller");
+        return createRestApi("基础数据","com.datalevel.showhiddencontrol.base.controller");
     }
 
     @Bean(name = "auth")
     public Docket createRestApiAuth(){
-        return createRestApi("权限基础","com.datalevel.showhiddencontrol.auth.controller");
+        return createRestApi("权限配置","com.datalevel.showhiddencontrol.auth.controller");
     }
     @Bean(name = "other")
     public Docket createRestApiOther(){

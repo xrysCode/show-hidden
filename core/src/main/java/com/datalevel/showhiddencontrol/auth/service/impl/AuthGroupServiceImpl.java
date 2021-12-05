@@ -91,5 +91,8 @@ public class AuthGroupServiceImpl extends ServiceImpl<AuthGroupMapper, AuthGroup
         removeByIds(ids);
     }
 
-
+    @Override
+    public List<AuthGroupEntity> selectByUserAndAppServices(Long userId, Long appId, List<Long> serviceIds) {
+        return getBaseMapper().selectByUserAndAppServices( userId,  appId, serviceIds);
+    }
 }

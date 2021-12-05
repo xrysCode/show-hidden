@@ -7,8 +7,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.datalevel.showhiddencontrol.auth.entity.AuthFunEntity;
 import com.datalevel.showhiddencontrol.auth.mapper.AuthFieldMapper;
 import com.datalevel.showhiddencontrol.auth.mapper.AuthFunMapper;
+import com.datalevel.showhiddencontrol.auth.service.IAuthFunService;
 import com.datalevel.showhiddencontrol.base.dto.FunctionModuleSaveDto;
 import com.datalevel.showhiddencontrol.base.dto.FunctionModuleTreeDto;
 import com.datalevel.showhiddencontrol.base.dto.TreeShiftDto;
@@ -51,6 +53,8 @@ public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModul
     IBaseApplicationService iBaseApplicationService;
     @Autowired
     IBaseServiceService iBaseServiceService;
+    @Autowired
+    IAuthFunService iAuthFunService;
 
     @Override
     public List<FunctionModuleTreeDto> queryByAppId(Long appId) {
@@ -188,5 +192,16 @@ public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModul
             ).collect(Collectors.toList());
             iBaseFunFieldService.saveBatch(baseFunFieldEntityList);
         }
+    }
+
+    @Override
+    public List<BaseFunctionModuleEntity> selectByAuthId(List<Long> authIds) {
+        LambdaQueryWrapper<AuthFunEntity> queryWrapper = new QueryWrapper<AuthFunEntity>().lambda().in(AuthFunEntity::getAuthId, authIds);
+        List<Long> funIds = iAuthFunService.list(queryWrapper).stream()
+                .map(AuthFunEntity::getFunId).collect(Collectors.toList());
+        if(funIds.size()==0){
+            return new ArrayList<>();
+        }
+        return listByIds(funIds);
     }
 }

@@ -22,4 +22,4 @@ mybatis-plus:
 
 auth:
   code: auth-centre
-  auth-field: auth_keys
+#  auth-field: auth_keys
