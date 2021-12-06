@@ -4,6 +4,8 @@ package com.datalevel.showhiddencontrol.base.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.datalevel.showhiddencontrol.auth.AppServiceEnum;
+import com.datalevel.showhiddencontrol.base.dto.CascaderAppServiceDto;
 import com.datalevel.showhiddencontrol.base.entity.BaseApplicationEntity;
 import com.datalevel.showhiddencontrol.base.service.IBaseApplicationService;
 import com.datalevel.showhiddencontrol.common.RequestPage;
@@ -65,4 +67,11 @@ public class BaseApplicationController {
         iBaseApplicationService.delApp(ids);
         return new ResponseResult<>(true);
     }
+
+    @GetMapping("cascaderService")
+    @ApiOperation(value = "级联服务")
+    public ResponseResult<List<CascaderAppServiceDto>> cascaderService(){
+        return new ResponseResult<>(iBaseApplicationService.cascaderService());
+    }
+
 }

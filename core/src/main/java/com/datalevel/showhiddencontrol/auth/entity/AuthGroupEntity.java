@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler;
 import com.datalevel.showhiddencontrol.auth.AppServiceEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.type.EnumTypeHandler;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -50,7 +50,7 @@ public class AuthGroupEntity implements Serializable {
     private String authDesc;
 
     @ApiModelProperty(value = "app service 类型，枚举(app，service)")
-    @TableField(typeHandler = MybatisEnumTypeHandler.class)
+    @TableField(typeHandler = EnumTypeHandler.class)
     @NotNull(groups = {Update.class, Insert.class})
     private AppServiceEnum appServiceType;
 

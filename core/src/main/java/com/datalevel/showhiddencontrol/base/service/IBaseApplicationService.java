@@ -1,6 +1,7 @@
 package com.datalevel.showhiddencontrol.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.datalevel.showhiddencontrol.base.dto.CascaderAppServiceDto;
 import com.datalevel.showhiddencontrol.base.entity.BaseApplicationEntity;
 
 import java.util.List;
@@ -16,4 +17,6 @@ import java.util.List;
 public interface IBaseApplicationService extends IService<BaseApplicationEntity> {
 
     void delApp(List<Long> ids);
+
+    List<CascaderAppServiceDto> cascaderService();
 }

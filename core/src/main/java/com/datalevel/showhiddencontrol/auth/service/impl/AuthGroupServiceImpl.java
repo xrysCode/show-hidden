@@ -59,7 +59,7 @@ public class AuthGroupServiceImpl extends ServiceImpl<AuthGroupMapper, AuthGroup
         List<AuthGroupDto> authGroupDtoList = page.getRecords().stream().map(authGroupEntity -> {
             AuthGroupDto authGroupDto = BeanUtil.copyProperties(authGroupEntity, AuthGroupDto.class);
             if (authGroupEntity.getAppServiceType() == AppServiceEnum.APP) {
-                BaseApplicationEntity applicationEntity = iBaseApplicationService.getById(authGroupEntity.getId());
+                BaseApplicationEntity applicationEntity = iBaseApplicationService.getById(authGroupEntity.getAppServiceId());
                 authGroupDto.setAppServiceName(applicationEntity.getAppName());
             } else {
                 BaseServiceEntity serviceEntity = iBaseServiceService.getById(authGroupEntity.getAppServiceId());
