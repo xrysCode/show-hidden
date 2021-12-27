@@ -33,5 +33,11 @@ public class AuthFunDto extends AuthFunEntity {
     @ApiModelProperty(value = "功能名")
     private String funName;
 
+    @ApiModelProperty(value = "code编码，数据级使用，目的降低字符长度")
+    private Integer authCode;
 
+    @ApiModelProperty(value = "组描述")
+    private String authDesc;
+    @ApiModelProperty(value = "用户id")
+    private Long userId;
 }

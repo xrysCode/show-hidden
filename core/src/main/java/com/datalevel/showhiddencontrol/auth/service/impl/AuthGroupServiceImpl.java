@@ -25,8 +25,10 @@ import com.datalevel.showhiddencontrol.other.service.IUserAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sun.misc.Unsafe;
 
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -94,5 +96,17 @@ public class AuthGroupServiceImpl extends ServiceImpl<AuthGroupMapper, AuthGroup
     @Override
     public List<AuthGroupEntity> selectByUserAndAppServices(Long userId, Long appId, List<Long> serviceIds) {
         return getBaseMapper().selectByUserAndAppServices( userId,  appId, serviceIds);
+    }
+
+    @Override
+    public List<AuthGroupEntity> getAuthOptions(AppServiceEnum appServiceType, Long serviceId) {
+        Long appServiceId = serviceId;
+        if(appServiceType==AppServiceEnum.APP){
+            appServiceId = iBaseServiceService.getById(serviceId).getAppId();
+        }
+        LambdaQueryWrapper<AuthGroupEntity> queryWrapper = new QueryWrapper<AuthGroupEntity>().lambda()
+                .eq(AuthGroupEntity::getAppServiceType, appServiceType)
+                .eq(AuthGroupEntity::getAppServiceId, appServiceId);
+        return list(queryWrapper);
     }
 }

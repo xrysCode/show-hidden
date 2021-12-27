@@ -29,7 +29,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/auth/fun")
 @ApiSort(10)
-@Api(tags = "功能分组")
+@Api(tags = "功能权限关联")
 public class AuthFunController {
     @Autowired
     IAuthFunService iAuthFunService;

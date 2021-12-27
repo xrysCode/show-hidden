@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Update;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -32,11 +33,11 @@ public class AuthFunEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    @NotBlank(groups = {Update.class})
+    @NotNull(groups = {Update.class})
     private Long id;
-    @NotBlank(groups = {Update.class, Insert.class})
+    @NotNull(groups = {Update.class, Insert.class})
     private Long funId;
-    @NotBlank(groups = {Update.class, Insert.class})
+    @NotNull(groups = {Update.class, Insert.class})
     private Long authId;
 
     private LocalDateTime createTime;

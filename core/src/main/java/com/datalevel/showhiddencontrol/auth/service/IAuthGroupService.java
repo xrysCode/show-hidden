@@ -1,6 +1,7 @@
 package com.datalevel.showhiddencontrol.auth.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.datalevel.showhiddencontrol.auth.AppServiceEnum;
 import com.datalevel.showhiddencontrol.auth.dto.AuthGroupDto;
 import com.datalevel.showhiddencontrol.auth.entity.AuthGroupEntity;
 import com.datalevel.showhiddencontrol.common.RequestPage;
@@ -23,4 +24,6 @@ public interface IAuthGroupService extends IService<AuthGroupEntity> {
     ResponsePage<AuthGroupDto> getByPage(RequestPage requestPage);
 
     List<AuthGroupEntity> selectByUserAndAppServices(Long userId, Long appId, List<Long> serviceIds);
+
+    List<AuthGroupEntity> getAuthOptions(AppServiceEnum appServiceType, Long appServiceId);
 }

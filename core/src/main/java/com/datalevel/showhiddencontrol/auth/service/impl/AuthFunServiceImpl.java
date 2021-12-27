@@ -50,7 +50,9 @@ public class AuthFunServiceImpl extends ServiceImpl<AuthFunMapper, AuthFunEntity
             BaseFunctionModuleEntity functionModuleEntity = iBaseFunctionModuleService.getById(authFunEntity.getFunId());
             return BeanUtil.copyProperties(authFunEntity, AuthFunDto.class)
                     .setAuthName(authGroupEntity.getAuthName())
-                    .setFunName(functionModuleEntity.getFunName());
+                    .setFunName(functionModuleEntity.getFunName())
+                    .setAuthCode(authGroupEntity.getAuthCode())
+                    .setAuthDesc(authGroupEntity.getAuthDesc());
         }).collect(Collectors.toList());
 
         return responsePage.setRecords(authFunDtoList);

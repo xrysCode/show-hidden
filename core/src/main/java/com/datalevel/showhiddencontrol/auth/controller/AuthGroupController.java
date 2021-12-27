@@ -5,6 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.datalevel.showhiddencontrol.auth.AppServiceEnum;
 import com.datalevel.showhiddencontrol.auth.dto.AuthGroupDto;
 import com.datalevel.showhiddencontrol.auth.entity.AuthGroupEntity;
 import com.datalevel.showhiddencontrol.auth.service.IAuthGroupService;
@@ -13,6 +14,7 @@ import com.datalevel.showhiddencontrol.common.RequestPage;
 import com.datalevel.showhiddencontrol.common.ResponsePage;
 import com.datalevel.showhiddencontrol.common.ResponseResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiSort;
 import org.apache.ibatis.annotations.Insert;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -34,7 +37,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/auth/group")
 @ApiSort(10)
-@Api(tags = "功能分组权限")
+@Api(tags = "权限组")
 public class AuthGroupController {
     @Autowired
     IAuthGroupService iAuthGroupService;
@@ -72,5 +75,9 @@ public class AuthGroupController {
         return new ResponseResult<>(true);
     }
 
-
+    @GetMapping("getAuthOptions")
+    @ApiOperation(value = "查询下拉权限选项")
+    public ResponseResult<List<AuthGroupEntity>> getAuthOptions(@RequestParam AppServiceEnum appServiceType,@RequestParam Long appServiceId){
+        return new ResponseResult<>(iAuthGroupService.getAuthOptions(appServiceType,appServiceId));
+    }
 }

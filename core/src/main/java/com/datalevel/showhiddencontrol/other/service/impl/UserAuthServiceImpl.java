@@ -31,6 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -59,22 +63,26 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
     @Override
     public ResponsePage<UserAuthDto> getByPage(RequestPage requestPage, UserAuthEntity userAuthQuery) {
 //        userAuthEntity.setCreateTime(null).setCreateUser(null);
-        Page<UserAuthEntity> page = Page.of(requestPage.getCurrent(), requestPage.getSize());
+        Page<UserInfoEntity> page = Page.of(requestPage.getCurrent(), requestPage.getSize());
+        iUserInfoService.page(page);
+        List<Long> userIds = page.getRecords().stream().map(UserInfoEntity::getId).collect(Collectors.toList());
         LambdaQueryWrapper<UserAuthEntity> queryWrapper = new QueryWrapper<UserAuthEntity>().lambda()
-                .setEntity(userAuthQuery)
-                .orderByDesc(UserAuthEntity::getId);
-        page(page, queryWrapper);
-        ResponsePage responsePage = BeanUtil.copyProperties(page, ResponsePage.class);
-        List<UserAuthDto> userAuthDtoList = page.getRecords().stream().map(userAuthEntity -> {
+                .in(UserAuthEntity::getUserId,userIds);
+        Map<Long, List<AuthFunDto>> userAuthMap = list(queryWrapper).stream().map(userAuthEntity -> {
             AuthGroupEntity authGroupEntity = iAuthGroupService.getById(userAuthEntity.getAuthId());
-            UserInfoEntity userInfoEntity = iUserInfoService.getById(userAuthEntity.getUserId());
-            return (UserAuthDto)BeanUtil.copyProperties(userInfoEntity, UserAuthDto.class)
-                    .setUserId(userInfoEntity.getId())
-                    .setAuthId(authGroupEntity.getId())
-                    .setAuthName(authGroupEntity.getAuthName())
-                    .setId(userAuthEntity.getId());
+            AuthFunDto authFunDto = BeanUtil.copyProperties(authGroupEntity, AuthFunDto.class);
+            BeanUtil.copyProperties(userAuthEntity, authFunDto);
+            authFunDto.setUserId(userAuthEntity.getUserId());
+            return authFunDto;
+        }).collect(Collectors.groupingBy(AuthFunDto::getUserId));
+
+        List<UserAuthDto> userAuthDtoList = page.getRecords().stream().map(userInfoEntity -> {
+            UserAuthDto userAuthDto = BeanUtil.copyProperties(userInfoEntity, UserAuthDto.class);
+            userAuthDto.setAuthList(userAuthMap.get(userInfoEntity.getId()));
+            return userAuthDto;
         }).collect(Collectors.toList());
 
+        ResponsePage responsePage = BeanUtil.copyProperties(page, ResponsePage.class);
         return responsePage.setRecords(userAuthDtoList);
     }
 
