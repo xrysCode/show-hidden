@@ -8,19 +8,21 @@
         FROM
             auth_group a
             INNER JOIN user_auth u ON a.id = u.auth_id
-            AND u.auth_id = #{userId}
-        WHERE
-        <if test="appId!=null">
-            (a.app_service_type = 'APP' AND a.app_service_id = #{appId})
-        </if>
+            AND u.user_id = #{userId}
+      <where>
+          <if test="appId!=null">
+              (a.app_service_type = 'APP' AND a.app_service_id = #{appId})
+          </if>
 
-        <if test="serviceIds!=null serviceIds.size!=0">
-            or (a.app_service_type = 'SERVICE' and a.app_service_id in
-            <foreach collection="serviceIds" item="serviceId" open="(" close=")" separator=",">
-                #{serviceId}
-            </foreach>
-            )
-        </if>
+          <if test="serviceIds!=null and serviceIds.size!=0">
+              or (a.app_service_type = 'SERVICE' and a.app_service_id in
+              <foreach collection="serviceIds" item="serviceId" open="(" close=")" separator=",">
+                  #{serviceId}
+              </foreach>
+              )
+          </if>
+      </where>
+
 
     </select>
 </mapper>

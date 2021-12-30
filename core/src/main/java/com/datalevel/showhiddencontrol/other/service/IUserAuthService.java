@@ -5,9 +5,9 @@ import com.datalevel.showhiddencontrol.base.entity.BaseFunctionModuleEntity;
 import com.datalevel.showhiddencontrol.common.RequestPage;
 import com.datalevel.showhiddencontrol.common.ResponsePage;
 import com.datalevel.showhiddencontrol.other.dto.UserAuthDto;
+import com.datalevel.showhiddencontrol.other.dto.UserAuthSimpleDto;
 import com.datalevel.showhiddencontrol.other.dto.UserAuthInfo;
 import com.datalevel.showhiddencontrol.other.entity.UserAuthEntity;
-import io.swagger.models.auth.In;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ import java.util.List;
  */
 public interface IUserAuthService extends IService<UserAuthEntity> {
 
-    ResponsePage<UserAuthDto> getByPage(RequestPage requestPage, UserAuthEntity userAuthEntity);
+    ResponsePage<UserAuthSimpleDto> getByPage(RequestPage requestPage, UserAuthEntity userAuthEntity);
 
     /**
      *
@@ -40,4 +40,5 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
     UserAuthInfo getUserBackendAuthKeys(String serviceCode, Long userId);
 
 
+    List<UserAuthDto> getUserAuth(Long userId);
 }

@@ -1,14 +1,12 @@
 package com.datalevel.showhiddencontrol.other.controller;
 
 
-import com.datalevel.showhiddencontrol.auth.dto.AuthFunDto;
-import com.datalevel.showhiddencontrol.auth.entity.AuthFunEntity;
-import com.datalevel.showhiddencontrol.auth.service.IAuthFunService;
 import com.datalevel.showhiddencontrol.base.entity.BaseFunctionModuleEntity;
 import com.datalevel.showhiddencontrol.common.RequestPage;
 import com.datalevel.showhiddencontrol.common.ResponsePage;
 import com.datalevel.showhiddencontrol.common.ResponseResult;
 import com.datalevel.showhiddencontrol.other.dto.UserAuthDto;
+import com.datalevel.showhiddencontrol.other.dto.UserAuthSimpleDto;
 import com.datalevel.showhiddencontrol.other.entity.UserAuthEntity;
 import com.datalevel.showhiddencontrol.other.service.IUserAuthService;
 import com.datalevel.showhiddencontrol.sdk.auth.UserAuth;
@@ -37,10 +35,17 @@ public class UserAuthController {
     @Autowired
     IUserAuthService iUserAuthService;
     @GetMapping
-    @ApiOperation(value = "查询用户权限分配")
-    public ResponseResult<ResponsePage<UserAuthDto>> getByPage(RequestPage requestPage, UserAuthEntity userAuthEntity){
+    @ApiOperation(value = "查询分页用户权限分配")
+    public ResponseResult<ResponsePage<UserAuthSimpleDto>> getByPage(RequestPage requestPage, UserAuthEntity userAuthEntity){
         return new ResponseResult<>(iUserAuthService.getByPage(requestPage,userAuthEntity));
     }
+
+    @GetMapping("userAuth")
+    @ApiOperation(value = "查询用户权限分配")
+    public ResponseResult<List<UserAuthDto>> getUserAuth(Long userId){
+        return new ResponseResult<>(iUserAuthService.getUserAuth(userId));
+    }
+
     @PostMapping
     @ApiOperation(value = "添加用户权限分配")
     public ResponseResult<Boolean> addApp(@RequestBody @Validated(Insert.class) UserAuthEntity request){

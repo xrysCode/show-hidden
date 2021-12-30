@@ -196,11 +196,15 @@ public class BaseFunctionModuleServiceImpl extends ServiceImpl<BaseFunctionModul
 
     @Override
     public List<BaseFunctionModuleEntity> selectByAuthId(List<Long> authIds) {
-        LambdaQueryWrapper<AuthFunEntity> queryWrapper = new QueryWrapper<AuthFunEntity>().lambda().in(AuthFunEntity::getAuthId, authIds);
+        if(authIds.size()==0){
+            return Collections.emptyList();
+        }
+        LambdaQueryWrapper<AuthFunEntity> queryWrapper = new QueryWrapper<AuthFunEntity>()
+                .lambda().in(AuthFunEntity::getAuthId, authIds);
         List<Long> funIds = iAuthFunService.list(queryWrapper).stream()
                 .map(AuthFunEntity::getFunId).collect(Collectors.toList());
         if(funIds.size()==0){
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         return listByIds(funIds);
     }

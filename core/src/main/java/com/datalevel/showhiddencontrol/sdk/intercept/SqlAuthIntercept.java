@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 //                @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
         }
 )
-//@Component
+@Component
 public class SqlAuthIntercept implements Interceptor {
     static ThreadLocal<Boolean> needAuth=new ThreadLocal<>();
 

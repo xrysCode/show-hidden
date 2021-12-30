@@ -52,7 +52,7 @@ public class SwaggerConfig {
     private Docket createRestApi(String groupName ,String basePackage){
         ParameterBuilder ticketPar = new ParameterBuilder();
         List<Parameter> pars = new ArrayList<>();
-        Parameter build = ticketPar.name("Token")
+        Parameter build = ticketPar.name("token")
                 .description("令牌")
                 .modelRef(new ModelRef("string"))
                 .parameterType("header")

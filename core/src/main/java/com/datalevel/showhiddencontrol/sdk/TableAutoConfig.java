@@ -2,6 +2,7 @@ package com.datalevel.showhiddencontrol.sdk;
 
 import com.datalevel.showhiddencontrol.communicate.TableSync;
 import com.datalevel.showhiddencontrol.communicate.dto.TableScanDto;
+import com.datalevel.showhiddencontrol.other.service.IUserAuthService;
 import com.datalevel.showhiddencontrol.sdk.auth.UserAuth;
 import com.datalevel.showhiddencontrol.sdk.intercept.SqlAuthIntercept;
 import com.datalevel.showhiddencontrol.sdk.table.TableFieldScan;
@@ -34,10 +35,8 @@ public class TableAutoConfig {
         return tableFieldScan;
     }
     @Bean
-    public UserAuth userAuth(TableFieldScan tableFieldScan){
-        UserAuth userAuth = new UserAuth();
-        userAuth.setAuthCode(authCode);
-        userAuth.setTableFieldScan(tableFieldScan);
+    public UserAuth userAuth(TableFieldScan tableFieldScan, IUserAuthService iUserAuthService){
+        UserAuth userAuth = new UserAuth(authCode,tableFieldScan,iUserAuthService);
         return userAuth;
     }
 
