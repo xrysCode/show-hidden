@@ -2,8 +2,10 @@ package com.datalevel.showhiddencontrol.base.entity;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.datalevel.showhiddencontrol.other.entity.OtherMenusEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
@@ -19,6 +21,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,7 +35,7 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("base_function_module")
+@TableName(value = "base_function_module",autoResultMap = true)
 @ApiModel(value="BaseFunctionModuleEntity对象", description="功能、模块点，按照页面维度划分;	情况1：是web 那么是组件，组件由第一次访问页面的路径+组件自己的prop的key确定唯一，来表示坐标。	情况2：是后端接口，那么也由浏览器地址加api接口确定是否是唯一。")
 public class BaseFunctionModuleEntity implements Serializable {
 
@@ -58,19 +61,23 @@ public class BaseFunctionModuleEntity implements Serializable {
     @NotNull(groups = {Insert.class,Update.class,})
     private String currentReferer;
 
+    @ApiModelProperty(value = "组件唯一标识，（当前页web路由:组件名[:字段标识]）")
+    private String comUniqueFlag;
+
     @ApiModelProperty(value = "后端访问接口")
     private String requestUrl;
 
     @ApiModelProperty(value = "请求方法")
-    private String requestMethod;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> requestMethods;
 
     @ApiModelProperty(value = "页面组件类型json 必有{name,__file,props}")
-    @JsonIgnore
-    private String comType;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String,Object> componentType;
 
     @ApiModelProperty(value = "props k-v 对；确定组件props的唯一值，组件是复用的，所以有相同的type，但是组件的props的值不同，这里只保存能够确定组件的关键值来组成K-v的数据，如果权限匹配到这些数据那么就进行管控，确定唯一的方式是referer+type+props的值，当有多个冲突的时候那么增加props的值对")
-    @JsonIgnore
-    private String comProps;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String,Object> componentProps;
 
     @ApiModelProperty(value = "排序")
     private Integer sort;
@@ -79,23 +86,4 @@ public class BaseFunctionModuleEntity implements Serializable {
 
     private LocalDateTime createTime;
 
-    @ApiModelProperty(value = "组件type 属性json")
-    public Map<String,Object> getComponentType() {
-        return JSONUtil.toBean(comType, HashMap.class);
-    }
-    @ApiModelProperty(value = "组件type 属性json")
-    public BaseFunctionModuleEntity setComponentType(Map<String,Object> componentType) {
-        this.comType = JSONUtil.toJsonStr(componentType);;
-        return this;
-    }
-
-    @ApiModelProperty(value = "组件props 属性json")
-    public Map<String,Object> getComponentProps() {
-        return JSONUtil.toBean(comProps, HashMap.class);
-    }
-    @ApiModelProperty(value = "组件props 属性json")
-    public BaseFunctionModuleEntity setComponentProps(Map<String,Object> componentProps) {
-        this.comProps = JSONUtil.toJsonStr(componentProps);;
-        return this;
-    }
 }

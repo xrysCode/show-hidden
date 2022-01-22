@@ -29,7 +29,6 @@ import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +126,7 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
         });
         baseFunctionModuleEntities.forEach(functionModuleEntity -> {
             if(StrUtil.isNotBlank(functionModuleEntity.getRequestUrl())){
-                userAuthInfo.addApiAuth(functionModuleEntity.getRequestUrl(),functionModuleEntity.getRequestMethod());
+                userAuthInfo.addApiAuth(functionModuleEntity.getRequestUrl(),functionModuleEntity.getRequestMethods());
             }
         });
         return userAuthInfo;
